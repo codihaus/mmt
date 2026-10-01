@@ -41,6 +41,20 @@ I mostly run it on macOS. Linux works too; it uses `xdg-open`, `wl-copy` or
 `xclip`, and `notify-send` when they're around. Pasting images from the
 clipboard is Mac only for now.
 
+On Windows, unzip `mmt-windows-amd64-….zip` (or `arm64`) and run the
+installer from PowerShell, then open a new Windows Terminal window:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\mmt-windows-amd64\install.ps1
+```
+
+It copies `mmt.exe` to `%LOCALAPPDATA%\Programs\mmt` and adds that folder to
+your PATH. The Windows build is new and barely tested, so treat it as a
+preview: chat, threads and commands should be fine, notifications go through
+a PowerShell toast, and there's no image paste, inline images or background
+agent yet. Reports from Windows users are very welcome. Use Windows Terminal; the old
+console window can't draw it properly.
+
 ## First run
 
 ```sh

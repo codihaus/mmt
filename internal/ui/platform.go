@@ -8,6 +8,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/atotto/clipboard"
+
 	"github.com/codihaus/mmt/internal/launcher"
 )
 
@@ -48,7 +50,8 @@ func copyText(text string) error {
 	case "darwin":
 		candidates = [][]string{{"pbcopy"}}
 	case "windows":
-		candidates = [][]string{{"clip"}}
+		// clip.exe reads the console code page and mangles UTF-8
+		return clipboard.WriteAll(text)
 	default:
 		candidates = [][]string{{"wl-copy"}, {"xclip", "-selection", "clipboard"}, {"xsel", "--clipboard", "--input"}}
 	}
@@ -103,5 +106,19 @@ func (m *Model) notify(title, body string) {
 		if _, err := exec.LookPath("notify-send"); err == nil {
 			go exec.Command("notify-send", "--", title, body).Run()
 		}
+	case "windows":
+		// a toast through PowerShell; the text travels in environment
+		// variables so it is never parsed as script
+		cmd := exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", windowsToast)
+		cmd.Env = append(os.Environ(), "MMT_TOAST_TITLE="+title, "MMT_TOAST_BODY="+body)
+		go cmd.Run()
 	}
 }
+
+const windowsToast = `[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
+$xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
+$text = $xml.GetElementsByTagName('text')
+$text.Item(0).AppendChild($xml.CreateTextNode($env:MMT_TOAST_TITLE)) | Out-Null
+$text.Item(1).AppendChild($xml.CreateTextNode($env:MMT_TOAST_BODY)) | Out-Null
+$app = '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe'
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($app).Show([Windows.UI.Notifications.ToastNotification]::new($xml))`

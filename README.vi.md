@@ -39,6 +39,19 @@ Mình chủ yếu chạy trên macOS. Linux cũng chạy được, có `xdg-open
 hoặc `xclip`, `notify-send` thì app dùng. Dán ảnh từ clipboard hiện chỉ có
 trên Mac.
 
+Trên Windows, giải nén `mmt-windows-amd64-….zip` (hoặc `arm64`), chạy script
+cài trong PowerShell rồi mở một cửa sổ Windows Terminal mới:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\mmt-windows-amd64\install.ps1
+```
+
+Script chép `mmt.exe` vào `%LOCALAPPDATA%\Programs\mmt` và thêm thư mục đó vào
+PATH. Bản Windows còn mới và gần như chưa được test, coi như bản xem trước:
+chat, thread và lệnh chắc là ổn, thông báo đi qua toast của PowerShell, còn
+dán ảnh, ảnh inline và agent chạy ngầm thì chưa có. Ai dùng Windows thì báo
+giúp mình nhé. Nên dùng Windows Terminal, cửa sổ console cũ không vẽ đúng giao diện.
+
 ## Lần đầu chạy
 
 ```sh

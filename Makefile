@@ -1,4 +1,4 @@
-.PHONY: build test lint demo install video video-server icon
+.PHONY: build test lint demo install video video-server icon release
 
 build:
 	go build -o mmt .
@@ -53,3 +53,28 @@ icon:
 	iconutil -c icns $$tmp/mmt.iconset -o internal/background/mmt.icns && \
 	sips -z 256 256 $$tmp/icon.png --out docs/icon.png >/dev/null && \
 	echo "wrote internal/background/mmt.icns and docs/icon.png"
+
+# Release archives in dist/: a universal macOS binary (needs a Mac, for cgo),
+# Linux and Windows builds. make release VERSION=v0.2.0
+VERSION ?= v0.1.0-beta.$(shell date +%Y%m%d)
+LDFLAGS := -s -w -X main.version=$(VERSION)
+
+release:
+	@rm -rf dist/release && mkdir -p dist/release
+	@for d in macos linux-amd64 linux-arm64; do mkdir -p dist/release/mmt-$$d; \
+		cp README.md LICENSE dist/release/mmt-$$d/; cp scripts/install.sh dist/release/mmt-$$d/; done
+	@for a in amd64 arm64; do mkdir -p dist/release/mmt-windows-$$a; \
+		cp README.md LICENSE scripts/install.ps1 dist/release/mmt-windows-$$a/; done
+	CGO_ENABLED=1 GOARCH=arm64 go build -trimpath -ldflags "$(LDFLAGS)" -o dist/release/mmt-arm64 .
+	CGO_ENABLED=1 GOARCH=amd64 go build -trimpath -ldflags "$(LDFLAGS)" -o dist/release/mmt-amd64 .
+	lipo -create -output dist/release/mmt-macos/mmt dist/release/mmt-arm64 dist/release/mmt-amd64
+	codesign --force --sign - dist/release/mmt-macos/mmt
+	@rm dist/release/mmt-arm64 dist/release/mmt-amd64
+	for a in amd64 arm64; do \
+		CGO_ENABLED=0 GOOS=linux GOARCH=$$a go build -trimpath -ldflags "$(LDFLAGS)" -o dist/release/mmt-linux-$$a/mmt . && \
+		CGO_ENABLED=0 GOOS=windows GOARCH=$$a go build -trimpath -ldflags "$(LDFLAGS)" -o dist/release/mmt-windows-$$a/mmt.exe . || exit 1; \
+	done
+	@cd dist/release && \
+	for d in macos linux-amd64 linux-arm64; do COPYFILE_DISABLE=1 tar -czf mmt-$$d-$(VERSION).tar.gz mmt-$$d; done && \
+	for a in amd64 arm64; do zip -qr mmt-windows-$$a-$(VERSION).zip mmt-windows-$$a; done && \
+	shasum -a 256 *.tar.gz *.zip > SHA256SUMS && cat SHA256SUMS
