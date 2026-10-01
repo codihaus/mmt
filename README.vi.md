@@ -82,6 +82,7 @@ vào cửa sổ để đính kèm.
 | `Ctrl+K` | Tìm kênh hoặc người |
 | `Alt+↑` `Alt+↓` | Kênh trước / kế (hoặc `Ctrl+P` / `Ctrl+N`) |
 | `Alt+A` | Kênh chưa đọc kế tiếp |
+| `Alt+U` | Chỉ hiện hội thoại chưa đọc, hoặc hiện lại tất cả (hoặc bấm nút ở đầu sidebar) |
 | `Ctrl+T` | Đổi team |
 | `↑` khi ô nhập trống | Chọn tin. `Enter` mở thread, `o` mở tệp đính kèm, `y` copy link, `w` mở trên trình duyệt |
 | `Tab` | Chuyển giữa sidebar, kênh và thread |

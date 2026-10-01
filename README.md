@@ -86,6 +86,7 @@ thread, scroll with the wheel, drag to select text. Paste a screenshot with
 | `Ctrl+K` | Find a channel or person |
 | `Alt+↑` `Alt+↓` | Previous / next channel (also `Ctrl+P` / `Ctrl+N`) |
 | `Alt+A` | Next unread |
+| `Alt+U` | Show only conversations with unread messages, or everything again (also the button at the top of the sidebar) |
 | `Ctrl+T` | Next team |
 | `↑` on an empty input | Select messages. `Enter` opens the thread, `o` opens the attachment, `y` copies the link, `w` opens it in the browser |
 | `Tab` | Move between sidebar, channel and thread |
