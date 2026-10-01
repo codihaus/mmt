@@ -2,6 +2,7 @@
 # Installs mmt into ~/.local/bin.
 set -e
 dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+[ -f "$dir/mmt" ] || { echo "install.sh: no mmt binary next to this script" >&2; exit 1; }
 mkdir -p "$HOME/.local/bin"
 # remove first: copying over a signed binary that macOS has already run gets
 # the new one killed on launch

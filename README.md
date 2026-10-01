@@ -125,9 +125,9 @@ seconds is stopped. To send a message that really starts with `!`, write `\!`.
 ### Calls
 
 A terminal can't do audio, so mmt doesn't try. Calls show up as cards, you get
-a notification when someone calls you in a DM, and clicking the card (or
-`/call`) opens the channel in the Mattermost desktop app so you can join from
-there.
+a notification when someone calls you in a DM, and clicking the card, the
+notification or typing `/call` joins the call in your browser. With no call
+running, `/call` opens the channel so you can start one there.
 
 ### Notifications when mmt is closed
 

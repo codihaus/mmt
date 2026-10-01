@@ -73,7 +73,7 @@ func EnableCmdKeys() { cmdKeys = true }
 
 var macKeys = strings.NewReplacer(
 	"Ctrl+K", "Cmd+K", "Ctrl+V", "Cmd+V", "Ctrl+T", "Cmd+T",
-	"Alt+↑↓", "Cmd+↑↓", "Alt+↑ / Alt+↓", "Cmd+↑ / Cmd+↓", "Alt+A", "Cmd+Shift+A",
+	"Alt+↑↓", "Cmd+↑↓", "Alt+↑ / Alt+↓", "Cmd+↑ / Cmd+↓", "Alt+A", "Cmd+Shift+A", "Alt+U", "Cmd+Shift+U",
 )
 
 // tr translates an English UI string into the configured language.

@@ -149,6 +149,7 @@ func itermKeyMap() map[string]any {
 		key(0xf701, cmd|numpad): esc("[1;3B"), // Cmd+Down -> Alt+Down
 		key(0xd, shift):         hex("0x0a"),  // Shift+Enter -> newline
 		key('a', cmd|shift):     esc("a"),     // Cmd+Shift+A -> Alt+A next unread
+		key('u', cmd|shift):     esc("u"),     // Cmd+Shift+U -> Alt+U unread filter
 		key('A', cmd|shift):     esc("a"),
 	}
 }
@@ -249,6 +250,7 @@ func launchGhostty(exe string) error {
 		`cmd+down=text:\x1b[1;3B`,
 		`shift+enter=text:\n`,
 		`cmd+shift+a=text:\x1ba`,
+		`cmd+shift+u=text:\x1bu`,
 	}
 	args := []string{"-na", appPath("Ghostty.app"), "--args", "--macos-option-as-alt=true"}
 	for _, b := range binds {

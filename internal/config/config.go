@@ -27,6 +27,8 @@ type Config struct {
 	Lock string `json:"lock,omitempty"`
 	// LockAfter locks the app after this many idle minutes; 0 never.
 	LockAfter int `json:"lock_after_minutes,omitempty"`
+	// UnreadsOnly shows only conversations with unread messages in the sidebar.
+	UnreadsOnly bool `json:"unreads_only,omitempty"`
 
 	fromEnv bool // server came from MMT_URL; never persisted
 }
@@ -64,14 +66,14 @@ func Load() (*Config, error) {
 	return c, nil
 }
 
-// SetLastChannel records the open channel. It rereads the file first, so
-// settings changed by other mmt commands while mmt was open are kept.
-func SetLastChannel(id string) error {
+// Update changes the saved config. It rereads the file first, so settings
+// changed by other mmt commands while mmt was open are kept.
+func Update(change func(*Config)) error {
 	c, err := Load()
 	if err != nil {
 		return err
 	}
-	c.LastChannel = id
+	change(c)
 	return c.Save()
 }
 

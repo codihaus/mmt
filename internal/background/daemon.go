@@ -162,8 +162,10 @@ func (a *agent) handle(ev *model.WebSocketEvent) {
 		if err := a.c.EnsureUsers(cx, []string{owner}); err == nil {
 			name = a.c.Username(owner)
 		}
+		// a terminal cannot join a call, so the click joins it in the browser
+		url := a.webURL(cx, ch)
 		cancel()
-		a.notify(i18n.T("Incoming call"), fmt.Sprintf(i18n.T("%s is calling you"), "@"+name), ch)
+		a.notify(i18n.T("Incoming call"), fmt.Sprintf(i18n.T("%s is calling you"), "@"+name), ch, url)
 	}
 }
 
@@ -206,7 +208,7 @@ func (a *agent) onPosted(data map[string]any) {
 	if body == "" && len(p.FileIds) > 0 {
 		body = i18n.T("sent a file")
 	}
-	a.notify(title, body, p.ChannelId)
+	a.notify(title, body, p.ChannelId, "")
 }
 
 func str(data map[string]any, key string) string {
@@ -214,7 +216,7 @@ func str(data map[string]any, key string) string {
 	return s
 }
 
-func (a *agent) notify(title, body, channel string) {
+func (a *agent) notify(title, body, channel, url string) {
 	// an open mmt window shows its own notifications
 	if uiOpen() {
 		return
@@ -225,15 +227,26 @@ func (a *agent) notify(title, body, channel string) {
 	if r := []rune(body); len(r) > 200 {
 		body = string(r[:200]) + "…"
 	}
-	show(title, body, channel)
+	show(title, body, channel, url)
 }
 
-// open is called when a notification is clicked: it opens mmt on that
-// channel in the configured terminal.
-func (a *agent) open(channel string) {
+// open is called when a notification is clicked: it opens url in the
+// browser when there is one (calls), else mmt on that channel in the
+// configured terminal.
+func (a *agent) open(channel, url string) {
 	cfg, err := config.Load()
 	if err != nil {
 		log.Printf("open: %v", err)
+		return
+	}
+	if url != "" {
+		args := []string{url}
+		if cfg.Browser != "" {
+			args = []string{"-a", cfg.Browser, url}
+		}
+		if err := exec.Command("open", args...).Run(); err != nil {
+			log.Printf("open %s: %v", url, err)
+		}
 		return
 	}
 	if channel != "" {
@@ -251,4 +264,13 @@ func (a *agent) open(channel string) {
 	if err != nil {
 		log.Printf("open mmt: %v", err)
 	}
+}
+
+// webURL is the Calls window for a channel, which joins its call.
+func (a *agent) webURL(cx context.Context, channelID string) string {
+	teams, _, err := a.c.API.GetTeamsForUser(cx, a.c.Me.Id, "")
+	if err != nil || len(teams) == 0 {
+		return ""
+	}
+	return mm.CallURL(a.c.Server(), mm.Clean(teams[0].Name), channelID)
 }

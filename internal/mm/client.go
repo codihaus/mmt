@@ -36,6 +36,12 @@ func New(server, token string) *Client {
 
 func (c *Client) Server() string { return c.server }
 
+// CallURL opens the Calls plugin's call window for a channel, which joins
+// the running call. Any team the user is in works for a DM.
+func CallURL(server, team, channelID string) string {
+	return server + "/" + team + "/com.mattermost.calls/expanded/" + channelID
+}
+
 // Login exchanges username/password (and optional MFA code) for a session token.
 func Login(ctx context.Context, server, login, password, mfa string) (string, error) {
 	api := model.NewAPIv4Client(server)

@@ -120,8 +120,9 @@ gõ `\!`.
 ### Cuộc gọi
 
 Terminal không có âm thanh nên mmt không cố làm phần này. Cuộc gọi hiện thành
-thẻ, có người gọi riêng thì có thông báo, click vào thẻ (hoặc gõ `/call`) để mở
-kênh trong app Mattermost desktop rồi vào gọi từ đó.
+thẻ, có người gọi riêng thì có thông báo. Click vào thẻ, vào thông báo hoặc gõ
+`/call` là vào thẳng cuộc gọi trên trình duyệt. Kênh chưa có cuộc gọi thì
+`/call` mở kênh đó để bạn bắt đầu gọi.
 
 ### Thông báo khi đã tắt mmt
 

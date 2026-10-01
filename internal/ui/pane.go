@@ -115,7 +115,7 @@ func (m *Model) geo() geo {
 	if m.w >= 70 {
 		g.sideW = sidebarWidth + 1
 	}
-	g.sideTop = 2
+	g.sideTop = 3 // title, team, unread filter button
 	g.sideRows = max(m.h-1-g.sideTop, 1)
 	g.mainW = max(m.w-g.sideW, 20)
 	g.split = m.thread != nil && g.mainW >= splitMinW

@@ -96,6 +96,7 @@ func (m *Model) handleEvent(ev *model.WebSocketEvent) tea.Cmd {
 			if it := m.items[id]; it != nil {
 				it.unread, it.mentions = 0, 0
 			}
+			m.unreadsChanged()
 		}
 
 	case model.WebsocketEventMultipleChannelsViewed:
@@ -105,6 +106,7 @@ func (m *Model) handleEvent(ev *model.WebSocketEvent) tea.Cmd {
 					it.unread, it.mentions = 0, 0
 				}
 			}
+			m.unreadsChanged()
 		}
 
 	case model.WebsocketEventDirectAdded, model.WebsocketEventGroupAdded, model.WebsocketEventChannelCreated:
@@ -197,6 +199,7 @@ func (m *Model) onPosted(p *model.Post, data map[string]any) tea.Cmd {
 		if mentioned || dm {
 			it.mentions++
 		}
+		m.unreadsChanged()
 	}
 	if mentioned || dm {
 		sender, _ := data["sender_name"].(string)

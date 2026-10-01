@@ -64,6 +64,8 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 		return m.stepChannel(1, false)
 	case "alt+a":
 		return m.stepChannel(1, true)
+	case "alt+u":
+		return m.toggleUnreads()
 	case "pgup":
 		m.p().vp.HalfPageUp()
 		return m.maybeLoadOlder()
@@ -426,8 +428,11 @@ func (m *Model) handleMouse(ev tea.MouseMsg) tea.Cmd {
 
 	m.textSel = nil
 	if inSide {
-		if ev.Y == g.sideTop-1 {
+		switch ev.Y {
+		case 1:
 			return m.cycleTeam()
+		case 2:
+			return m.toggleUnreads()
 		}
 		i := m.sideOffset + ev.Y - g.sideTop
 		if i < 0 || i >= len(m.rows) {
@@ -510,7 +515,8 @@ var localCommands = []command{
 	{"/msg", "@user", "Same as /dm"},
 	{"/open", "", "Open the current channel or thread in the browser"},
 	{"/link", "", "Copy the web link of the current channel or thread"},
-	{"/call", "", "Join or start a call in the Mattermost app"},
+	{"/call", "", "Join or start a call in the browser"},
+	{"/unreads", "", "Show only conversations with unread messages, or all again"},
 	{"/help", "", "Show shortcuts"},
 	{"/quit", "", "Quit mmt"},
 	{"/away", "", "Set status to away (server)"},
@@ -629,6 +635,8 @@ func (m *Model) runCommand(text string) tea.Cmd {
 		return nil
 	case "/call":
 		return m.openCallCmd(m.cur)
+	case "/unreads":
+		return m.toggleUnreads()
 	case "/open":
 		if u := m.currentURL(); u != "" {
 			return m.openURLCmd(u)

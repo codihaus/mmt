@@ -415,6 +415,7 @@ func (m *Model) viewSidebar(g geo) string {
 	lines := []string{
 		" " + stTitle.Render("mmt") + " " + stDim.Render("@"+m.c.Me.Username) + " " + dot,
 		ansi.Truncate(teamLine, sidebarWidth, "…"),
+		ansi.Truncate(m.unreadsButton(), sidebarWidth, "…"),
 	}
 	end := min(m.sideOffset+g.sideRows, len(m.rows))
 	for i := m.sideOffset; i < end; i++ {
@@ -427,6 +428,26 @@ func (m *Model) viewSidebar(g geo) string {
 		Border(lipgloss.NormalBorder(), false, true, false, false).
 		BorderForeground(colBorder)
 	return col.Render(strings.Join(lines, "\n"))
+}
+
+// unreadsButton is the clickable switch for the unread filter, with the
+// number of conversations that have something new.
+func (m *Model) unreadsButton() string {
+	n := 0
+	for _, it := range m.items {
+		if (it.ch.TeamId == m.team || isDM(it.ch)) && m.hasUnread(it) {
+			n++
+		}
+	}
+	label := tr("Unreads")
+	if n > 0 {
+		label += fmt.Sprintf(" %d", n)
+	}
+	hint := stDim.Render(keys("  Alt+U"))
+	if m.cfg.UnreadsOnly {
+		return " " + stMention.Render("● "+label) + hint
+	}
+	return " " + stSideNormal.Render("○ "+label) + hint
 }
 
 func (m *Model) sideRow(i int) string {
@@ -547,6 +568,7 @@ func helpBox() string {
 		{"/link  /open", "Copy link / open the channel or thread on the web"},
 		{"Alt+↑ / Alt+↓", "Previous / next channel (or Ctrl+P / Ctrl+N)"},
 		{"Alt+A", "Next unread channel"},
+		{"Alt+U", "Show only unread conversations, or all again"},
 		{"Tab / Shift+Tab", "Switch pane: sidebar → channel → thread"},
 		{"↑ (empty input)", "Select messages; Enter opens the thread"},
 		{"Click", "Open a channel; click a message twice for its thread"},

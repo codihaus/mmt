@@ -401,12 +401,63 @@ func (m *Model) sortedTeams() []*model.Team {
 
 func (m *Model) buildRows() {
 	m.rows = m.rows[:0]
-	if cats := m.cats[m.team]; cats != nil && len(cats.Categories) > 0 {
+	if m.cfg.UnreadsOnly {
+		m.buildUnreadRows()
+	} else if cats := m.cats[m.team]; cats != nil && len(cats.Categories) > 0 {
 		m.buildCategoryRows(cats)
 	} else {
 		m.buildDefaultRows()
 	}
 	m.syncSideCursor()
+}
+
+// buildUnreadRows is the unread filter: one list of the conversations with
+// something new, most recent first, like the web app's Unreads filter. The
+// open channel stays listed until you leave it.
+func (m *Model) buildUnreadRows() {
+	var list []*chanItem
+	for _, it := range m.items {
+		if (it.ch.TeamId == m.team || isDM(it.ch)) && (m.hasUnread(it) || it.ch.Id == m.cur) {
+			list = append(list, it)
+		}
+	}
+	sortByRecent(list)
+	// the Unreads button above already says what this list is
+	if len(list) == 0 {
+		m.rows = append(m.rows, row{header: tr("Nothing unread")})
+	}
+	for _, it := range list {
+		m.rows = append(m.rows, row{item: it})
+	}
+}
+
+// unreadsChanged re-lists the sidebar when the unread filter depends on
+// counts that just changed.
+func (m *Model) unreadsChanged() {
+	if m.cfg.UnreadsOnly {
+		m.buildRows()
+	}
+}
+
+// toggleUnreads switches the sidebar between all conversations and only
+// the unread ones, and remembers the choice.
+func (m *Model) toggleUnreads() tea.Cmd {
+	on := !m.cfg.UnreadsOnly
+	m.cfg.UnreadsOnly = on
+	m.sideOffset = 0
+	m.sideFollow = true
+	m.buildRows()
+	if on {
+		m.setStatus(keys(tr("Showing unread conversations only · Alt+U shows all")), false)
+	} else {
+		m.setStatus(tr("Showing all conversations"), false)
+	}
+	return func() tea.Msg {
+		if err := config.Update(func(c *config.Config) { c.UnreadsOnly = on }); err != nil {
+			return statusMsg{text: err.Error(), err: true}
+		}
+		return nil
+	}
 }
 
 // visibleDM reports whether a DM makes the cut when the DM list is limited.
@@ -658,7 +709,7 @@ func (m *Model) switchTo(id string) tea.Cmd {
 		cmds = append(cmds, m.postsCmd(id, ""))
 	}
 	cmds = append(cmds, m.viewCmd(id, m.prev), m.input.Focus(), func() tea.Msg {
-		if err := config.SetLastChannel(id); err != nil {
+		if err := config.Update(func(c *config.Config) { c.LastChannel = id }); err != nil {
 			return statusMsg{text: err.Error(), err: true}
 		}
 		return nil

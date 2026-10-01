@@ -2,49 +2,44 @@ package ui
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/codihaus/mmt/internal/mm"
 )
 
 // Calls (the com.mattermost.calls plugin) need audio and video, which a
 // terminal cannot do. mmt shows call posts as cards, notifies on incoming
-// DM calls, and hands off to the Mattermost desktop app (or the browser) to
-// join.
+// DM calls, and opens the channel in the web app to join.
 
 const (
 	callPostType  = "custom_calls"
 	callEventPref = "custom_com.mattermost.calls_"
 )
 
-// desktopApp reports whether the Mattermost desktop app is installed; it
-// registers the mattermost:// scheme.
-func desktopApp() bool {
-	home, _ := os.UserHomeDir()
-	for _, p := range []string{"/Applications/Mattermost.app", filepath.Join(home, "Applications", "Mattermost.app")} {
-		if _, err := os.Stat(p); err == nil {
-			return true
-		}
-	}
-	return false
-}
-
-// callURL opens a channel where calls can be joined: the desktop app when
-// installed, else the web app.
+// callURL is where a call is joined in the browser: the Calls plugin's own
+// call window when one is running, else the channel, to start one there.
 func (m *Model) callURL(channelID string) string {
 	it := m.items[channelID]
 	if it == nil {
 		return ""
 	}
-	u := m.channelURL(it)
-	if desktopApp() {
-		u = "mattermost://" + strings.TrimPrefix(strings.TrimPrefix(u, "https://"), "http://")
+	if m.activeCall(channelID) {
+		return mm.CallURL(m.c.Server(), m.teamName(it.ch.TeamId), channelID)
 	}
-	return u
+	return m.channelURL(it)
+}
+
+// joinCallURL is the call window for a card that shows a running call.
+func (m *Model) joinCallURL(channelID string) string {
+	it := m.items[channelID]
+	if it == nil {
+		return ""
+	}
+	return mm.CallURL(m.c.Server(), m.teamName(it.ch.TeamId), channelID)
 }
 
 func (m *Model) openCallCmd(channelID string) tea.Cmd {
@@ -52,18 +47,8 @@ func (m *Model) openCallCmd(channelID string) tea.Cmd {
 	if u == "" {
 		return nil
 	}
-	m.setStatus(tr("Calls need audio; opening the channel in Mattermost to join"), false)
-	return func() tea.Msg {
-		// mattermost:// goes to the desktop app, not the configured browser
-		app := m.cfg.Browser
-		if strings.HasPrefix(u, "mattermost://") {
-			app = ""
-		}
-		if err := openExternal(u, app); err != nil {
-			return statusMsg{text: tr("Cannot open link: ") + err.Error(), err: true}
-		}
-		return nil
-	}
+	m.setStatus(tr("Calls need audio; opening the channel in the browser to join"), false)
+	return m.openURLCmd(u)
 }
 
 func propInt(p *model.Post, key string) int64 {
@@ -89,7 +74,7 @@ func (m *Model) callLines(p *model.Post) ([]string, string) {
 		head += stDim.Render(" · " + title)
 	}
 	if end == 0 && status != "missed" && status != "declined" {
-		return []string{head, stLink.Render(tr("In progress")) + stDim.Render(tr("  ↗ click to join"))}, m.callURL(p.ChannelId)
+		return []string{head, stLink.Render(tr("In progress")) + stDim.Render(tr("  ↗ click to join"))}, m.joinCallURL(p.ChannelId)
 	}
 	var info string
 	switch {
