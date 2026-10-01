@@ -12,6 +12,8 @@ import (
 func TestCatalogCoversSource(t *testing.T) {
 	re := regexp.MustCompile(`(?:\btr|i18n\.T)\(("(?:[^"\\]|\\.)*")\)`)
 	files, _ := filepath.Glob("../ui/*.go")
+	bg, _ := filepath.Glob("../background/*.go")
+	files = append(files, bg...)
 	files = append(files, "../../main.go", "../launcher/launcher.go")
 	for _, f := range files {
 		src, err := os.ReadFile(f)
@@ -42,6 +44,9 @@ func TestDetect(t *testing.T) {
 		t.Errorf("LANG=vi_VN: got %q", got)
 	}
 	t.Setenv("MMT_LANG", "en")
+	if got := Detect("vi"); got != "en" {
+		t.Errorf("MMT_LANG should win over the config: got %q", got)
+	}
 	if got := Detect(""); got != "en" {
 		t.Errorf("MMT_LANG should win over LANG: got %q", got)
 	}

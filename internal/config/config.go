@@ -64,6 +64,17 @@ func Load() (*Config, error) {
 	return c, nil
 }
 
+// SetLastChannel records the open channel. It rereads the file first, so
+// settings changed by other mmt commands while mmt was open are kept.
+func SetLastChannel(id string) error {
+	c, err := Load()
+	if err != nil {
+		return err
+	}
+	c.LastChannel = id
+	return c.Save()
+}
+
 func (c *Config) Save() error {
 	if c.fromEnv {
 		return nil

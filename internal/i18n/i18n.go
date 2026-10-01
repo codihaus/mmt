@@ -28,16 +28,23 @@ func Lang() string { return lang }
 // Detect picks the language from the config value, then MMT_LANG, then the
 // usual locale variables.
 func Detect(configured string) string {
+	if v := os.Getenv("MMT_LANG"); v != "" {
+		return pick(v)
+	}
 	if configured != "" {
 		return configured
 	}
-	for _, v := range []string{"MMT_LANG", "LC_ALL", "LC_MESSAGES", "LANG"} {
+	for _, v := range []string{"LC_ALL", "LC_MESSAGES", "LANG"} {
 		if s := os.Getenv(v); s != "" {
-			if strings.HasPrefix(strings.ToLower(s), "vi") {
-				return "vi"
-			}
-			return "en"
+			return pick(s)
 		}
+	}
+	return "en"
+}
+
+func pick(locale string) string {
+	if strings.HasPrefix(strings.ToLower(locale), "vi") {
+		return "vi"
 	}
 	return "en"
 }

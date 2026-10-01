@@ -322,4 +322,15 @@ var vi = map[string]string{
 	"\\! sends a message starting with !":                     "\\! để gửi tin bắt đầu bằng !",
 	"!command":                                                "!lệnh",
 	"Run a shell command on this computer":                    "Chạy lệnh shell trên máy này",
+	// background agent
+	"Show notifications for mentions and direct messages while mmt is closed? [Y/n]: ":                           "Hiện thông báo khi có người nhắc tên hoặc nhắn riêng, kể cả lúc đã tắt mmt? [Y/n]: ",
+	"Notifications while mmt is closed are on. Keep them? [Y/n]: ":                                               "Thông báo khi đã tắt mmt đang bật. Giữ nguyên? [Y/n]: ",
+	"Background notifications are off.":                                                                          "Đã tắt thông báo chạy ngầm.",
+	"Background notifications are on. macOS may ask once whether mmt can send notifications; allow it.":          "Đã bật thông báo chạy ngầm. macOS có thể hỏi một lần có cho mmt gửi thông báo không, hãy chọn Cho phép.",
+	"Background notifications need the macOS build of mmt.":                                                      "Thông báo chạy ngầm cần bản mmt cho macOS.",
+	"Background notifications are off. Turn them on with `mmt background on`.":                                   "Thông báo chạy ngầm đang tắt. Bật bằng `mmt background on`.",
+	"Background notifications are on and running.":                                                               "Thông báo chạy ngầm đang bật và chạy.",
+	"Background notifications are on but not running; see":                                                       "Thông báo chạy ngầm đã bật nhưng không chạy; xem",
+	"Background notifications are on, but macOS is blocking them. Allow mmt in System Settings → Notifications.": "Thông báo chạy ngầm đã bật nhưng macOS đang chặn. Hãy cho phép mmt trong System Settings → Notifications.",
+	"sent a file": "đã gửi một tệp",
 }

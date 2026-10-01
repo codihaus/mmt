@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 	"golang.org/x/term"
 
+	"github.com/codihaus/mmt/internal/background"
 	"github.com/codihaus/mmt/internal/config"
 	"github.com/codihaus/mmt/internal/i18n"
 	"github.com/codihaus/mmt/internal/launcher"
@@ -32,6 +34,8 @@ const usage = `mmt — Mattermost in the terminal
   mmt login    log in (the token is kept in the system keychain)
   mmt setup    choose the terminal and the interface language
   mmt lock     set up the app lock (Touch ID or a passcode)
+  mmt background on|off|status
+               notifications while mmt is closed (macOS)
   mmt logout   remove the stored token
 
 Environment: MMT_URL, MMT_TOKEN (override config and keychain), MMT_LANG (en, vi).
@@ -39,6 +43,11 @@ Environment: MMT_URL, MMT_TOKEN (override config and keychain), MMT_LANG (en, vi
 
 // version is set at build time: -ldflags "-X main.version=v0.1.0".
 var version = "dev"
+
+func init() {
+	// Cocoa, used by the background agent, must own the main thread
+	runtime.LockOSThread()
+}
 
 func main() {
 	if cfg, err := config.Load(); err == nil {
@@ -56,6 +65,8 @@ func main() {
 		err = setup()
 	case "lock":
 		err = setupLock()
+	case "background":
+		err = backgroundCmd()
 	case "logout":
 		err = logout()
 	case "-v", "--version", "version":
@@ -118,6 +129,11 @@ func run(here bool) error {
 	if restore, ok := launcher.AdoptITermProfile(); ok {
 		ui.EnableCmdKeys()
 		defer restore()
+	}
+
+	defer background.HoldUI()()
+	if exe, err := os.Executable(); err == nil {
+		go background.Refresh(exe, version)
 	}
 
 	app := ui.New(c, cfg)
@@ -203,6 +219,10 @@ func login() error {
 	if err := chooseTerminal(cfg, in); err != nil {
 		return err
 	}
+	if err := chooseBackground(in); err != nil {
+		return err
+	}
+	background.Restart()
 	fmt.Println(i18n.T("Run `mmt` to start."))
 	return nil
 }
@@ -216,7 +236,86 @@ func setup() error {
 	if err := chooseLanguage(cfg, in); err != nil {
 		return err
 	}
-	return chooseTerminal(cfg, in)
+	if err := chooseTerminal(cfg, in); err != nil {
+		return err
+	}
+	return chooseBackground(in)
+}
+
+// chooseBackground asks whether to keep notifications coming after mmt is
+// closed, and installs or removes the background agent.
+func chooseBackground(in *bufio.Reader) error {
+	if !background.Supported() {
+		return nil
+	}
+	on := background.Enabled()
+	prompt := i18n.T("Show notifications for mentions and direct messages while mmt is closed? [Y/n]: ")
+	if on {
+		prompt = i18n.T("Notifications while mmt is closed are on. Keep them? [Y/n]: ")
+	}
+	fmt.Print(prompt)
+	s, _ := in.ReadString('\n')
+	s = strings.ToLower(strings.TrimSpace(s))
+	want := s != "n" && s != "no" && s != "k" && s != "không"
+	if want == on {
+		return nil
+	}
+	return setBackground(want)
+}
+
+func setBackground(on bool) error {
+	if !on {
+		if err := background.Disable(); err != nil {
+			return err
+		}
+		fmt.Println(i18n.T("Background notifications are off."))
+		return nil
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return err
+	}
+	if err := background.Enable(exe, version); err != nil {
+		return err
+	}
+	fmt.Println(i18n.T("Background notifications are on. macOS may ask once whether mmt can send notifications; allow it."))
+	return nil
+}
+
+// backgroundCmd is `mmt background on|off|status`; `run` is what launchd
+// starts.
+func backgroundCmd() error {
+	sub := ""
+	if len(os.Args) > 2 {
+		sub = os.Args[2]
+	}
+	switch sub {
+	case "on":
+		return setBackground(true)
+	case "off":
+		return setBackground(false)
+	case "run":
+		exe := ""
+		if len(os.Args) > 3 {
+			exe = os.Args[3]
+		}
+		return background.Run(exe)
+	case "", "status":
+		switch {
+		case !background.Supported():
+			fmt.Println(i18n.T("Background notifications need the macOS build of mmt."))
+		case !background.Enabled():
+			fmt.Println(i18n.T("Background notifications are off. Turn them on with `mmt background on`."))
+		case background.Blocked():
+			fmt.Println(i18n.T("Background notifications are on, but macOS is blocking them. Allow mmt in System Settings → Notifications."))
+		case background.Running():
+			fmt.Println(i18n.T("Background notifications are on and running."))
+		default:
+			fmt.Println(i18n.T("Background notifications are on but not running; see"), background.LogPath())
+		}
+		return nil
+	}
+	return fmt.Errorf(i18n.T("unknown command %q\n\n%s"), "background "+sub, i18n.T(usage))
 }
 
 // chooseLanguage asks for the interface language and saves it.
@@ -315,6 +414,7 @@ func logout() error {
 	if err := config.DeleteToken(cfg.ServerURL); err != nil {
 		return err
 	}
+	background.Restart()
 	fmt.Println(i18n.T("Removed the token for"), cfg.ServerURL)
 	return nil
 }

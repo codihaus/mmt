@@ -650,7 +650,6 @@ func (m *Model) switchTo(id string) tea.Cmd {
 		m.buildRows()
 	}
 	m.cfg.LastChannel = id
-	saved := *m.cfg // write a copy so the file I/O never races with Update
 
 	var cmds []tea.Cmd
 	b := m.buf(id)
@@ -659,7 +658,7 @@ func (m *Model) switchTo(id string) tea.Cmd {
 		cmds = append(cmds, m.postsCmd(id, ""))
 	}
 	cmds = append(cmds, m.viewCmd(id, m.prev), m.input.Focus(), func() tea.Msg {
-		if err := saved.Save(); err != nil {
+		if err := config.SetLastChannel(id); err != nil {
 			return statusMsg{text: err.Error(), err: true}
 		}
 		return nil

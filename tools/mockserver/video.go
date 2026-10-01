@@ -15,15 +15,20 @@ import (
 	"golang.org/x/term"
 )
 
-// The video scenario: a made-up "secret organisation" in Vietnamese for
-// screen recordings. Teammates answer whatever you post, and the key
+// The video scenario: the Straw Hat crew from One Piece, for screen
+// recordings. Teammates answer whatever you post, and the key
 // controls (run the server in a second terminal) trigger the moments a demo
 // needs on cue: a mention, an incoming call, a DM while mmt is locked.
 
+// The three crew members the scenario revolves around keep their old ids;
+// zoro, sanji and usopp only chat in the galley.
 const (
-	uLan  = "u-lan"
-	uKhoa = "u-khoa"
-	uDuc  = "u-duc"
+	uLan   = "u-lan"  // robin
+	uKhoa  = "u-khoa" // nami
+	uDuc   = "u-duc"  // franky
+	uZoro  = "u-zoro"
+	uSanji = "u-sanji"
+	uUsopp = "u-usopp"
 )
 
 func newVideoServer() *server {
@@ -31,26 +36,29 @@ func newVideoServer() *server {
 	s := &server{
 		video: true,
 		users: map[string]obj{
-			me:    {"id": me, "username": "minh", "first_name": "Minh", "last_name": "Trần", "position": "Chỉ huy"},
-			uLan:  {"id": uLan, "username": "lan", "first_name": "Lan", "last_name": "Phạm", "position": "Đặc vụ hiện trường"},
-			uKhoa: {"id": uKhoa, "username": "khoa", "first_name": "Khoa", "last_name": "Lê", "position": "Trinh sát"},
-			uDuc:  {"id": uDuc, "username": "duc", "first_name": "Đức", "last_name": "Vũ", "position": "Kỹ thuật"},
+			me:     {"id": me, "username": "luffy", "first_name": "Monkey D.", "last_name": "Luffy", "position": "Captain"},
+			uLan:   {"id": uLan, "username": "robin", "first_name": "Nico", "last_name": "Robin", "position": "Archaeologist"},
+			uKhoa:  {"id": uKhoa, "username": "nami", "first_name": "Nami", "position": "Navigator"},
+			uDuc:   {"id": uDuc, "username": "franky", "first_name": "Franky", "position": "Shipwright"},
+			uZoro:  {"id": uZoro, "username": "zoro", "first_name": "Roronoa", "last_name": "Zoro", "position": "Swordsman"},
+			uSanji: {"id": uSanji, "username": "sanji", "first_name": "Sanji", "position": "Cook"},
+			uUsopp: {"id": uUsopp, "username": "usopp", "first_name": "Usopp", "position": "Sniper"},
 		},
 		posts: map[string][]obj{},
 		files: map[string][]byte{"f-radar": radarPNG()},
 	}
 	s.teams = []obj{
-		{"id": "t-404", "name": "phong-404", "display_name": "Phòng 404"},
-		{"id": "t-dem", "name": "doi-bong-dem", "display_name": "Đội Bóng Đêm"},
+		{"id": "t-404", "name": "straw-hats", "display_name": "Straw Hats"},
+		{"id": "t-dem", "name": "thousand-sunny", "display_name": "Thousand Sunny"},
 	}
 	s.channels = []obj{
-		{"id": "c-chithi", "team_id": "t-404", "type": "O", "name": "town-square", "display_name": "Chỉ thị", "header": "Lệnh từ chỉ huy · đọc xong làm ngay", "total_msg_count": 9, "last_post_at": now},
-		{"id": "c-trinhsat", "team_id": "t-404", "type": "O", "name": "trinh-sat", "display_name": "Trinh sát", "header": "Báo cáo hiện trường", "total_msg_count": 3, "last_post_at": now},
-		{"id": "c-lab", "team_id": "t-404", "type": "P", "name": "phong-thi-nghiem", "display_name": "Phòng thí nghiệm", "total_msg_count": 1, "last_post_at": now},
-		{"id": "c-kho", "team_id": "t-404", "type": "P", "name": "kho-luu-tru", "display_name": "Kho lưu trữ", "total_msg_count": 1, "last_post_at": now},
-		{"id": "c-tangau", "team_id": "t-404", "type": "O", "name": "tan-gau", "display_name": "Tán gẫu", "total_msg_count": 6, "last_post_at": now},
-		{"id": "c-dem-town", "team_id": "t-dem", "type": "O", "name": "town-square", "display_name": "Sảnh chính", "total_msg_count": 1, "last_post_at": now},
-		{"id": "c-dem-ops", "team_id": "t-dem", "type": "O", "name": "van-hanh", "display_name": "Vận hành", "total_msg_count": 2, "last_post_at": now},
+		{"id": "c-chithi", "team_id": "t-404", "type": "O", "name": "town-square", "display_name": "Captain's Orders", "header": "From the captain · read it, then set sail", "total_msg_count": 9, "last_post_at": now},
+		{"id": "c-trinhsat", "team_id": "t-404", "type": "O", "name": "lookout", "display_name": "Lookout", "header": "Reports from the crow's nest", "total_msg_count": 3, "last_post_at": now},
+		{"id": "c-lab", "team_id": "t-404", "type": "P", "name": "sick-bay", "display_name": "Sick Bay", "total_msg_count": 1, "last_post_at": now},
+		{"id": "c-kho", "team_id": "t-404", "type": "P", "name": "treasure-vault", "display_name": "Treasure Vault", "total_msg_count": 1, "last_post_at": now},
+		{"id": "c-tangau", "team_id": "t-404", "type": "O", "name": "galley", "display_name": "Galley", "total_msg_count": 6, "last_post_at": now},
+		{"id": "c-dem-town", "team_id": "t-dem", "type": "O", "name": "town-square", "display_name": "Deck", "total_msg_count": 1, "last_post_at": now},
+		{"id": "c-dem-ops", "team_id": "t-dem", "type": "O", "name": "engine-room", "display_name": "Engine Room", "total_msg_count": 2, "last_post_at": now},
 		{"id": "c-dm-lan", "type": "D", "name": me + "__" + uLan, "total_msg_count": 1, "last_post_at": now},
 		{"id": "c-dm-khoa", "type": "D", "name": me + "__" + uKhoa, "total_msg_count": 0, "last_post_at": now - 3600000},
 		{"id": "c-dm-duc", "type": "D", "name": me + "__" + uDuc, "total_msg_count": 0, "last_post_at": now - 86400000},
@@ -69,53 +77,53 @@ func newVideoServer() *server {
 	}
 	s.cats = map[string]obj{
 		"t-404": {"order": []string{"fav", "op", "ch", "dm"}, "categories": []obj{
-			{"id": "fav", "type": "favorites", "display_name": "Ưu tiên", "channel_ids": []string{"c-trinhsat"}},
-			{"id": "op", "type": "custom", "display_name": "Chiến dịch Bình Minh", "sorting": "manual", "channel_ids": []string{"c-chithi", "c-lab", "c-kho"}},
-			{"id": "ch", "type": "channels", "display_name": "Kênh", "sorting": "alpha", "collapsed": true, "channel_ids": []string{"c-tangau"}},
-			{"id": "dm", "type": "direct_messages", "display_name": "Tin nhắn riêng", "channel_ids": []string{"c-dm-lan", "c-dm-khoa", "c-dm-duc"}},
+			{"id": "fav", "type": "favorites", "display_name": "Priority", "channel_ids": []string{"c-trinhsat"}},
+			{"id": "op", "type": "custom", "display_name": "Course to Elbaf", "sorting": "manual", "channel_ids": []string{"c-chithi", "c-lab", "c-kho"}},
+			{"id": "ch", "type": "channels", "display_name": "Channels", "sorting": "alpha", "collapsed": true, "channel_ids": []string{"c-tangau"}},
+			{"id": "dm", "type": "direct_messages", "display_name": "Direct Messages", "channel_ids": []string{"c-dm-lan", "c-dm-khoa", "c-dm-duc"}},
 		}},
 		"t-dem": {"order": []string{"ch", "dm"}, "categories": []obj{
-			{"id": "ch", "type": "channels", "display_name": "Kênh", "sorting": "alpha", "channel_ids": []string{"c-dem-town", "c-dem-ops"}},
-			{"id": "dm", "type": "direct_messages", "display_name": "Tin nhắn riêng", "channel_ids": []string{"c-dm-lan", "c-dm-khoa", "c-dm-duc"}},
+			{"id": "ch", "type": "channels", "display_name": "Channels", "sorting": "alpha", "channel_ids": []string{"c-dem-town", "c-dem-ops"}},
+			{"id": "dm", "type": "direct_messages", "display_name": "Direct Messages", "channel_ids": []string{"c-dm-lan", "c-dm-khoa", "c-dm-duc"}},
 		}},
 	}
-	s.joinable = []obj{{"id": "c-dulieu", "team_id": "t-404", "type": "O", "name": "du-lieu-mat", "display_name": "Dữ liệu mật"}}
+	s.joinable = []obj{{"id": "c-dulieu", "team_id": "t-404", "type": "O", "name": "road-poneglyphs", "display_name": "Road Poneglyphs"}}
 
 	h := time.Hour
-	s.add("c-chithi", uKhoa, "Chiến dịch **Bình Minh** bắt đầu lúc 06:00 :rocket:", 26*h, "")
-	s.add("c-chithi", uLan, "rõ", 25*h, "")
-	brief := s.add("c-chithi", uKhoa, "khoa started a call", 6*h, "")
+	s.add("c-chithi", uKhoa, "We set sail at **06:00**. The Log Pose points north :ship:", 26*h, "")
+	s.add("c-chithi", uLan, "understood", 25*h, "")
+	brief := s.add("c-chithi", uKhoa, "nami started a call", 6*h, "")
 	brief["type"] = "custom_calls"
 	brief["props"] = obj{"start_at": time.Now().Add(-6 * h).UnixMilli(), "end_at": time.Now().Add(-6*h + 14*time.Minute).UnixMilli(),
-		"title": "Họp giao ban", "participants": []string{uKhoa, uLan, me}}
-	plan := s.add("c-chithi", uLan, "@minh anh duyệt giúp em kế hoạch thâm nhập, phần vượt firewall hơi căng", 3*h, "")
-	s.add("c-chithi", me, "để anh xem", 2*h, plan["id"].(string))
-	s.add("c-chithi", uLan, "cảm ơn anh!", 2*h-time.Minute, plan["id"].(string))
+		"title": "Crew meeting", "participants": []string{uKhoa, uLan, me}}
+	plan := s.add("c-chithi", uLan, "@luffy can you sign off on the landing plan? the Marine blockade part is tight", 3*h, "")
+	s.add("c-chithi", me, "leave it to me! shishishi", 2*h, plan["id"].(string))
+	s.add("c-chithi", uLan, "thank you, captain", 2*h-time.Minute, plan["id"].(string))
 	plan["reply_count"] = 2
-	s.add("c-chithi", uDuc, "Log từ máy chủ mục tiêu:\n```\naccess denied: 0x0BADC0DE\nretrying via proxy 10.0.0.42 ...\n```", 40*time.Minute, "")
-	s.add("c-chithi", uDuc, "đang thử đường khác", 39*time.Minute, "")
-	radar := s.add("c-chithi", uKhoa, "Ảnh radar khu vực mục tiêu, chi tiết ở https://example.com/radar", 30*time.Minute, "")
+	s.add("c-chithi", uDuc, "Engine log:\n```\ncola tank: 12%\ncoup de burst: offline\nrerouting power ...\n```", 40*time.Minute, "")
+	s.add("c-chithi", uDuc, "SUPER fix coming up", 39*time.Minute, "")
+	radar := s.add("c-chithi", uKhoa, "Weather chart for the next island, details at https://example.com/chart", 30*time.Minute, "")
 	radar["file_ids"] = []string{"f-radar"}
 	radar["metadata"] = obj{
-		"files": []obj{{"id": "f-radar", "name": "radar.png", "mime_type": "image/png", "width": 360, "height": 220}},
+		"files": []obj{{"id": "f-radar", "name": "weather-chart.png", "mime_type": "image/png", "width": 360, "height": 220}},
 		"reactions": []obj{
 			{"user_id": me, "post_id": radar["id"], "emoji_name": "+1", "create_at": 1},
 			{"user_id": uLan, "post_id": radar["id"], "emoji_name": "+1", "create_at": 2},
 			{"user_id": uDuc, "post_id": radar["id"], "emoji_name": "eyes", "create_at": 3},
 		},
 	}
-	s.add("c-trinhsat", uDuc, "Mục tiêu rời văn phòng lúc 18:05", 50*time.Minute, "")
-	s.add("c-trinhsat", uKhoa, "@minh xác nhận giúp em?", 10*time.Minute, "")
-	live := s.add("c-lab", uLan, "lan started a call", 5*time.Minute, "")
+	s.add("c-trinhsat", uDuc, "Marine warship off the port bow at 18:05", 50*time.Minute, "")
+	s.add("c-trinhsat", uKhoa, "@luffy do we change course?", 10*time.Minute, "")
+	live := s.add("c-lab", uLan, "robin started a call", 5*time.Minute, "")
 	live["type"] = "custom_calls"
-	live["props"] = obj{"start_at": time.Now().Add(-5 * time.Minute).UnixMilli(), "title": "Thử nghiệm thiết bị"}
-	s.add("c-kho", uDuc, "Đã sao lưu toàn bộ hồ sơ vào ổ mã hoá.", 2*h, "")
-	for i, m := range []string{"trưa nay ăn gì mọi người", "bún chả nhé", "ok", "ai lấy hộ cái tai nghe", "để em", "cà phê không?"} {
-		s.add("c-tangau", []string{uLan, uKhoa, uDuc}[i%3], m, time.Duration(90-i*10)*time.Minute, "")
+	live["props"] = obj{"start_at": time.Now().Add(-5 * time.Minute).UnixMilli(), "title": "Checkup with Chopper"}
+	s.add("c-kho", uDuc, "Treasure counted and locked away. Nami has the key.", 2*h, "")
+	for i, m := range []string{"lunch is ready. ladies first ♥", "where's the sake", "I once ate a whole Sea King, true story", "which way is the galley", "same way as yesterday, moss head", "LUNCH!!"} {
+		s.add("c-tangau", []string{uSanji, uZoro, uUsopp, uZoro, uSanji, uUsopp}[i], m, time.Duration(90-i*10)*time.Minute, "")
 	}
-	s.add("c-dem-town", uKhoa, "Chào mừng tới Đội Bóng Đêm.", 48*h, "")
-	s.add("c-dem-ops", uDuc, "Máy chủ dự phòng đã sẵn sàng", 3*h, "")
-	s.add("c-dm-lan", uLan, "Tối nay 9h vẫn theo kế hoạch chứ anh?", 5*time.Minute, "")
+	s.add("c-dem-town", uKhoa, "Welcome aboard the Thousand Sunny.", 48*h, "")
+	s.add("c-dem-ops", uDuc, "Coup de Burst is fueled and ready", 3*h, "")
+	s.add("c-dm-lan", uLan, "The poneglyph is translated. Library at 9?", 5*time.Minute, "")
 	return s
 }
 
@@ -161,17 +169,17 @@ func radarPNG() []byte {
 
 var (
 	videoReplies = []string{
-		"rõ, em triển khai ngay",
-		"nhận lệnh 🫡",
-		"ok anh, 5 phút nữa em báo lại",
-		"đã chuyển cho đội hiện trường",
-		"em đang theo dõi, có gì báo anh liền",
-		"xong rồi anh, sạch sẽ không dấu vết",
+		"aye aye, captain",
+		"on it 🫡",
+		"ok, reporting back in 5",
+		"passed it to the crew",
+		"watching the horizon, will ping you",
+		"done. not a trace left for the Marines",
 	}
 	videoThreadReplies = []string{
-		"em cập nhật kế hoạch theo ý anh rồi",
-		"đã hiểu, em sửa lại phần firewall",
-		"ok anh, chốt phương án B",
+		"course updated the way you wanted",
+		"got it, reworking the blockade part",
+		"ok, plan B it is",
 	}
 )
 
@@ -238,7 +246,7 @@ func (s *server) respond(p obj) {
 	case root != "":
 		msg = videoThreadReplies[turn%len(videoThreadReplies)]
 	case p["file_ids"] != nil:
-		msg = "ảnh nét đấy anh, em lưu vào hồ sơ rồi"
+		msg = "nice one, pinned it to the map"
 	}
 	s.say(channel, root, who, msg, nil)
 	time.Sleep(1200 * time.Millisecond)
@@ -248,7 +256,7 @@ func (s *server) respond(p obj) {
 // welcome has a teammate show up in a channel you just created.
 func (s *server) welcome(channel string) {
 	time.Sleep(2500 * time.Millisecond)
-	s.say(channel, "", uKhoa, "Đã vào vị trí. Chờ lệnh anh.", nil)
+	s.say(channel, "", uKhoa, "All hands on deck. Awaiting orders, captain.", nil)
 }
 
 func (s *server) currentChannel() string {
@@ -276,12 +284,12 @@ func (s *server) latestOwnPost() obj {
 
 const controlsHelp = `
   mmt video controls — keep this window off camera
-  1  khoa mentions you in #trinh-sat     (notification)
-  2  duc calls you                        (incoming call)
-  3  lan sends a DM                       (try it while mmt is locked)
+  1  nami mentions you in #lookout      (notification)
+  2  franky calls you                     (incoming call)
+  3  robin sends a DM                     (try it while mmt is locked)
   4  a teammate types and posts in the channel you have open
   5  a teammate reacts to your latest message
-  6  khoa posts a new radar image in the channel you have open
+  6  nami posts a new sea chart in the channel you have open
   q  quit
 `
 
@@ -306,14 +314,14 @@ func (s *server) controls() {
 		}
 		switch buf[0] {
 		case '1':
-			say("1: khoa → #trinh-sat\n> ")
-			go s.say("c-trinhsat", "", uKhoa, "@minh đối tượng vừa rời khỏi toà nhà, bám theo không anh?", []string{me})
+			say("1: nami → #lookout\n> ")
+			go s.say("c-trinhsat", "", uKhoa, "@luffy Marine warship off the starboard side, do we run?", []string{me})
 		case '2':
-			say("2: duc is calling\n> ")
+			say("2: franky is calling\n> ")
 			go s.incomingCall("c-dm-duc", uDuc)
 		case '3':
-			say("3: lan → DM\n> ")
-			go s.say("c-dm-lan", "", uLan, "Mật mã đêm nay: ECHO-404. Đọc xong xoá nhé.", nil)
+			say("3: robin → DM\n> ")
+			go s.say("c-dm-lan", "", uLan, "Found a Road Poneglyph. Coordinates are in the vault. Burn after reading.", nil)
 		case '4':
 			ch := s.currentChannel()
 			say("4: post in %s\n> ", ch)
@@ -321,7 +329,7 @@ func (s *server) controls() {
 			if dm := s.partner(ch); dm != "" {
 				who = dm
 			}
-			go s.say(ch, "", who, "Báo cáo: mọi thứ vẫn trong tầm kiểm soát.", nil)
+			go s.say(ch, "", who, "Status: all hands accounted for.", nil)
 		case '5':
 			if p := s.latestOwnPost(); p != nil {
 				say("5: reaction\n> ")
@@ -331,14 +339,14 @@ func (s *server) controls() {
 			}
 		case '6':
 			ch := s.currentChannel()
-			say("6: radar image in %s\n> ", ch)
+			say("6: sea chart in %s\n> ", ch)
 			go func() {
 				s.typing(ch, "", uKhoa)
 				time.Sleep(1500 * time.Millisecond)
 				s.mu.Lock()
-				p := s.add(ch, uKhoa, "Ảnh vệ tinh mới nhất", 0, "")
+				p := s.add(ch, uKhoa, "New sea chart", 0, "")
 				p["file_ids"] = []string{"f-radar"}
-				p["metadata"] = obj{"files": []obj{{"id": "f-radar", "name": "ve-tinh.png", "mime_type": "image/png", "width": 360, "height": 220}}}
+				p["metadata"] = obj{"files": []obj{{"id": "f-radar", "name": "sea-chart.png", "mime_type": "image/png", "width": 360, "height": 220}}}
 				ev := s.postedEvent(p, nil)
 				s.mu.Unlock()
 				s.broadcast(ev)

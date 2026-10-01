@@ -1,3 +1,5 @@
+<img src="docs/icon.png" width="96" align="right" alt="">
+
 # mmt
 
 Mattermost chạy trong terminal.
@@ -8,6 +10,8 @@ bạn sắp xếp trên web, thread mở ở panel bên phải, còn nếu dùng
 hiện luôn trong khung chat.
 
 [English](README.md)
+
+![mmt: sidebar, kênh đang mở và một tin nhắc tên](docs/screenshot.png)
 
 App còn mới. Ngày nào mình cũng dùng với server thật, nhưng chắc chắn vẫn còn
 chỗ chưa mượt, gặp lỗi thì cứ mở issue nhé.
@@ -105,6 +109,20 @@ gõ `\!`.
 Terminal không có âm thanh nên mmt không cố làm phần này. Cuộc gọi hiện thành
 thẻ, có người gọi riêng thì có thông báo, click vào thẻ (hoặc gõ `/call`) để mở
 kênh trong app Mattermost desktop rồi vào gọi từ đó.
+
+### Thông báo khi đã tắt mmt
+
+```sh
+mmt background on
+```
+
+Lệnh này bật một agent nhỏ chạy ngầm (LaunchAgent, khởi động lại máy vẫn tự
+chạy). Nó giữ kết nối và hiện thông báo macOS khi có người nhắc tên, nhắn
+riêng hay gọi, kể cả lúc không mở cửa sổ mmt nào. Bấm vào thông báo là mmt mở
+đúng kênh đó. Khi mmt đang mở thì agent im lặng, nên không bị báo hai lần.
+Lần đầu macOS sẽ hỏi có cho mmt gửi thông báo không, chọn Cho phép.
+`mmt background status` để xem agent có chạy không, `mmt background off` để
+gỡ. `mmt setup` cũng hỏi phần này.
 
 ## Phím Cmd trên macOS
 

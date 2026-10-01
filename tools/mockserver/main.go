@@ -43,7 +43,7 @@ type server struct {
 	teams    []obj
 	cats     map[string]obj // team id -> sidebar categories
 	joinable []obj          // public channels offered by search
-	video    bool           // the scripted Vietnamese scenario
+	video    bool           // the scripted scenario with key controls
 	current  string         // channel the client last viewed
 	turn     int            // rotates who answers in the video scenario
 }
@@ -52,7 +52,7 @@ const me = "u-demo"
 
 func main() {
 	addr := flag.String("addr", "127.0.0.1:8065", "listen address")
-	scenario := flag.String("scenario", "demo", "demo (English sample data) or video (scripted Vietnamese scenario with key controls)")
+	scenario := flag.String("scenario", "demo", "demo (English sample data) or video (scripted scenario with key controls)")
 	flag.Parse()
 	var s *server
 	if *scenario == "video" {

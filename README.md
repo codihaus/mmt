@@ -1,3 +1,5 @@
+<img src="docs/icon.png" width="96" align="right" alt="">
+
 # mmt
 
 Mattermost in the terminal.
@@ -9,21 +11,7 @@ images inline if you're on iTerm2.
 
 [Tiếng Việt](README.vi.md)
 
-```
- mmt @demo ●                │ # Town Square  Company-wide announcements        │ Thread in # Town Square · Esc close
- Acme  Ctrl+T switch        │──────────────────────────────────────────────────│────────────────────────────────────
- ▾ FAVORITES                │  ╭─ alice · 13:49 ──────────────────────────╮    │  ╭─ alice · 13:49 ───────────────╮
- # dev                   1  │  │ @demo could you review the migration PR? │    │  │ @demo could you review the    │
-                            │  │ ↳ 2 replies                              │    │  │ migration PR?                 │
- ▾ PROJECTS                 │  ╰──────────────────────────────────────────╯    │  ╰───────────────────────────────╯
- ◇ Release Planning         │                              ╭─ 14:49 · ↳ thread ─╮│                    ╭─── 14:49 ─╮
- # Town Square              │                              │ on it              ││                    │ on it     │
-                            │                              ╰────────────────────╯│                    ╰───────────╯
- ▾ DIRECT MESSAGES          │  ╭─ bob · 16:19 ────────────────────────────╮    │
- @ alice                 1  │  │ Latency after the fix                    │    │
- @ bob                      │  │ [image] latency.png  ↗ click to view     │    │
-                            │  │ 👍 2  👀 1                               │    │
-```
+![mmt with the sidebar, a channel and a mention](docs/screenshot.png)
 
 It's young. I use it every day against a real server, but expect rough edges,
 and please open an issue when you hit one.
@@ -126,6 +114,20 @@ A terminal can't do audio, so mmt doesn't try. Calls show up as cards, you get
 a notification when someone calls you in a DM, and clicking the card (or
 `/call`) opens the channel in the Mattermost desktop app so you can join from
 there.
+
+### Notifications when mmt is closed
+
+```sh
+mmt background on
+```
+
+This starts a small background agent (a LaunchAgent, so it comes back after
+a reboot) that stays connected and shows a macOS notification for mentions,
+DMs and incoming calls even when no mmt window is open. Click one and mmt
+opens on that channel. While mmt is open the agent keeps quiet, so you never
+get the same message twice. macOS asks once whether mmt may send
+notifications; say yes. `mmt background status` tells you if it's running,
+and `mmt background off` removes it. `mmt setup` asks about this too.
 
 ## Cmd keys on macOS
 
