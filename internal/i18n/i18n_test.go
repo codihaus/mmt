@@ -66,3 +66,18 @@ func TestT(t *testing.T) {
 		t.Errorf("unknown language should fall back to en, got %q", Lang())
 	}
 }
+
+// The usage text is a raw string constant, which the scan above can't see.
+func TestUsageTranslated(t *testing.T) {
+	src, err := os.ReadFile("../../main.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile("(?s)const usage = `(.*?)`").FindSubmatch(src)
+	if m == nil {
+		t.Fatal("usage constant not found in main.go")
+	}
+	if _, ok := vi[string(m[1])]; !ok {
+		t.Error("main.go usage text has no vi translation; update it in vi.go")
+	}
+}

@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -20,6 +21,7 @@ import (
 	"github.com/codihaus/mmt/internal/background"
 	"github.com/codihaus/mmt/internal/config"
 	"github.com/codihaus/mmt/internal/i18n"
+	"github.com/codihaus/mmt/internal/instance"
 	"github.com/codihaus/mmt/internal/launcher"
 	"github.com/codihaus/mmt/internal/lock"
 	"github.com/codihaus/mmt/internal/mm"
@@ -31,6 +33,7 @@ const usage = `mmt — Mattermost in the terminal
 
   mmt          start (opens in iTerm2/Ghostty when configured)
   mmt --here   run in the current terminal
+  mmt --new    open another window here, leaving the running one open
   mmt login    log in (the token is kept in the system keychain)
   mmt setup    choose the terminal and the interface language
   mmt lock     set up the app lock (Touch ID or a passcode)
@@ -56,9 +59,11 @@ func main() {
 	var err error
 	switch arg := firstArg(); arg {
 	case "":
-		err = run(false)
+		err = run(false, false)
 	case "--here":
-		err = run(true)
+		err = run(true, false)
+	case "--new":
+		err = run(true, true)
 	case "login":
 		err = login()
 	case "setup":
@@ -89,7 +94,9 @@ func firstArg() string {
 	return ""
 }
 
-func run(here bool) error {
+// run opens the UI. One window runs per server: a new one closes the one
+// already open, unless extra asks for another window alongside it.
+func run(here, extra bool) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return err
@@ -140,6 +147,14 @@ func run(here bool) error {
 	defer app.Cleanup()
 	p := tea.NewProgram(app, tea.WithAltScreen(), tea.WithMouseCellMotion())
 
+	var replaced atomic.Bool
+	if !extra {
+		defer instance.Claim(cfg.ServerURL, func() {
+			replaced.Store(true)
+			p.Quit()
+		})()
+	}
+
 	wsCtx, stop := context.WithCancel(context.Background())
 	defer stop()
 	go c.Listen(wsCtx,
@@ -148,6 +163,9 @@ func run(here bool) error {
 	)
 
 	_, err = p.Run()
+	if replaced.Load() {
+		fmt.Println(i18n.T("mmt was opened in another window."))
+	}
 	return err
 }
 

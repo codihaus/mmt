@@ -164,7 +164,7 @@ var vi = map[string]string{
 	"↑ select message":                                     "↑ chọn tin",
 	"Interface language":                                   "Ngôn ngữ giao diện",
 	"Jan 2, 2006":                                          "02/01/2006",
-	"mmt — Mattermost in the terminal\n\n  mmt          start (opens in iTerm2/Ghostty when configured)\n  mmt --here   run in the current terminal\n  mmt login    log in (the token is kept in the system keychain)\n  mmt setup    choose the terminal and the interface language\n  mmt logout   remove the stored token\n\nEnvironment: MMT_URL, MMT_TOKEN (override config and keychain), MMT_LANG (en, vi).\n": "mmt — Mattermost trong terminal\n\n  mmt          mở app (tự mở trong iTerm2/Ghostty nếu đã chọn)\n  mmt --here   chạy ngay trong terminal hiện tại\n  mmt login    đăng nhập (token lưu trong keychain của hệ thống)\n  mmt setup    chọn terminal và ngôn ngữ giao diện\n  mmt logout   xoá token đã lưu\n\nBiến môi trường: MMT_URL, MMT_TOKEN (ghi đè config và keychain), MMT_LANG (en, vi).\n",
+	"mmt — Mattermost in the terminal\n\n  mmt          start (opens in iTerm2/Ghostty when configured)\n  mmt --here   run in the current terminal\n  mmt --new    open another window here, leaving the running one open\n  mmt login    log in (the token is kept in the system keychain)\n  mmt setup    choose the terminal and the interface language\n  mmt lock     set up the app lock (Touch ID or a passcode)\n  mmt background on|off|status\n               notifications while mmt is closed (macOS)\n  mmt logout   remove the stored token\n\nEnvironment: MMT_URL, MMT_TOKEN (override config and keychain), MMT_LANG (en, vi).\n": "mmt — Mattermost trong terminal\n\n  mmt          mở app (tự mở trong iTerm2/Ghostty nếu đã chọn)\n  mmt --here   chạy ngay trong terminal hiện tại\n  mmt --new    mở thêm một cửa sổ tại đây, giữ cửa sổ đang chạy\n  mmt login    đăng nhập (token lưu trong keychain của hệ thống)\n  mmt setup    chọn terminal và ngôn ngữ giao diện\n  mmt lock     cài khoá app (Touch ID hoặc mật khẩu)\n  mmt background on|off|status\n               thông báo khi đã tắt mmt (macOS)\n  mmt logout   xoá token đã lưu\n\nBiến môi trường: MMT_URL, MMT_TOKEN (ghi đè config và keychain), MMT_LANG (en, vi).\n",
 	"too large, open it on the web":                                            "quá lớn, hãy mở trên web",
 	"Disconnected, reconnecting…":                                              "Mất kết nối, đang kết nối lại…",
 	"Warning: this server uses plain http, so your token is sent unencrypted.": "Cảnh báo: server dùng http thường, token sẽ được gửi không mã hoá.",
@@ -375,5 +375,6 @@ var vi = map[string]string{
 	"← parent folder":                        "← thư mục cha",
 	"Lock mmt now (same as Ctrl+L)":          "Khoá mmt ngay (giống Ctrl+L)",
 	"No lock set up yet; run `mmt lock` in a terminal first": "Chưa cài khoá; chạy `mmt lock` trong terminal trước",
-	"~ home": "~ thư mục nhà",
+	"mmt was opened in another window.":                      "mmt đã được mở ở cửa sổ khác.",
+	"~ home":                                                 "~ thư mục nhà",
 }
