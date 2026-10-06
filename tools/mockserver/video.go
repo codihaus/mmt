@@ -29,6 +29,7 @@ const (
 	uZoro  = "u-zoro"
 	uSanji = "u-sanji"
 	uUsopp = "u-usopp"
+	uNews  = "u-news" // a bot that posts message attachments
 )
 
 func newVideoServer() *server {
@@ -43,6 +44,7 @@ func newVideoServer() *server {
 			uZoro:  {"id": uZoro, "username": "zoro", "first_name": "Roronoa", "last_name": "Zoro", "position": "Swordsman"},
 			uSanji: {"id": uSanji, "username": "sanji", "first_name": "Sanji", "position": "Cook"},
 			uUsopp: {"id": uUsopp, "username": "usopp", "first_name": "Usopp", "position": "Sniper"},
+			uNews:  {"id": uNews, "username": "news_coo", "first_name": "News Coo", "is_bot": true},
 		},
 		posts: map[string][]obj{},
 		files: map[string][]byte{"f-radar": radarPNG()},
@@ -118,6 +120,26 @@ func newVideoServer() *server {
 	live["type"] = "custom_calls"
 	live["props"] = obj{"start_at": time.Now().Add(-5 * time.Minute).UnixMilli(), "title": "Checkup with Chopper"}
 	s.add("c-kho", uDuc, "Treasure counted and locked away. Nami has the key.", 2*h, "")
+	bounty := s.add("c-kho", uNews, "", 90*time.Minute, "")
+	bounty["props"] = obj{"attachments": []obj{{
+		"color":      "#d97706",
+		"title":      "WANTED: Monkey D. Luffy",
+		"title_link": "https://example.com/bounty/luffy",
+		"text":       "Bounty raised after Egghead. [Open the poster](https://example.com/bounty/luffy)",
+		"fields": []obj{
+			{"title": "Crew", "value": "Straw Hat Pirates", "short": true},
+			{"title": "Bounty", "value": "3,000,000,000 berries", "short": true},
+			{"title": "Status", "value": "at large", "short": true},
+			{"title": "Last seen", "value": "Elbaf", "short": true},
+		},
+		"footer": "World Government · Notice #80",
+		"actions": []obj{
+			{"id": "assign", "type": "select", "name": "Assign to..."},
+			{"id": "ack", "type": "button", "name": "✅ Acknowledge", "style": "good"},
+			{"id": "snooze", "type": "button", "name": "💤 Snooze 1h"},
+			{"id": "burn", "type": "button", "name": "🗑 Burn it", "style": "danger"},
+		},
+	}}}
 	for i, m := range []string{"lunch is ready. ladies first ♥", "where's the sake", "I once ate a whole Sea King, true story", "which way is the galley", "same way as yesterday, moss head", "LUNCH!!"} {
 		s.add("c-tangau", []string{uSanji, uZoro, uUsopp, uZoro, uSanji, uUsopp}[i], m, time.Duration(90-i*10)*time.Minute, "")
 	}

@@ -106,11 +106,14 @@ type Model struct {
 	imgWant  []string
 
 	sw        *switcher
-	lock      *lockState  // app lock screen; nil when unlocked
-	lastInput time.Time   // last key or mouse event, for the idle lock
-	shell     *shellView  // a !command and its output
-	wiz       *wizard     // management command form
-	result    *resultView // outcome of a management command
+	lock      *lockState   // app lock screen; nil when unlocked
+	lastInput time.Time    // last key or mouse event, for the idle lock
+	shell     *shellView   // a !command and its output
+	react     *reactPicker // emoji picker for a reaction
+	files     *filePicker  // file picker for /upload
+	uploadDir string       // where the file picker opened last
+	wiz       *wizard      // management command form
+	result    *resultView  // outcome of a management command
 	showHelp  bool
 	attach    []attachment
 	md        *markdown
@@ -841,6 +844,9 @@ func (m *Model) send() tea.Cmd {
 	if strings.HasPrefix(text, "/") && len(m.attach) == 0 {
 		return m.runCommand(text)
 	}
+	if r := reactShortcut.FindStringSubmatch(text); r != nil && len(m.attach) == 0 {
+		return m.reactToLatest(r[1])
+	}
 	if strings.HasPrefix(text, "!") && len(m.attach) == 0 {
 		return m.runShell(strings.TrimPrefix(text, "!"))
 	}
@@ -1097,6 +1103,10 @@ func (m *Model) update(msg tea.Msg) tea.Cmd {
 			}
 			return m.catsCmd(team)
 		}
+		return nil
+
+	case walkedMsg:
+		m.onWalked(msg)
 		return nil
 
 	case autoMsg:

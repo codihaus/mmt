@@ -247,9 +247,13 @@ func (m *Model) refreshPane(k paneKind, forceBottom bool) {
 // ---- drawing ----
 
 func (m *Model) viewMain(g geo) string {
-	if m.sw != nil || m.showHelp || m.wiz != nil || m.result != nil || m.shell != nil {
+	if m.sw != nil || m.showHelp || m.wiz != nil || m.result != nil || m.shell != nil || m.react != nil || m.files != nil {
 		var box string
 		switch {
+		case m.files != nil:
+			box = m.viewFiles(g.mainW, m.h)
+		case m.react != nil:
+			box = m.viewReact(g.mainW)
 		case m.shell != nil:
 			box = m.viewShell(g.mainW, m.h)
 		case m.result != nil:

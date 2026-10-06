@@ -6,7 +6,7 @@ Mattermost in the terminal.
 
 I spend most of the day in a terminal and got tired of switching to a browser
 tab every time someone pinged me, so I wrote this. It keeps the sidebar the way
-you arranged it on the web, opens threads in a panel on the right, and shows
+you arranged it in the app or on the web, opens threads in a panel on the right, and shows
 images inline if you're on iTerm2.
 
 [Tiếng Việt](README.vi.md)
@@ -88,10 +88,11 @@ thread, scroll with the wheel, drag to select text. Paste a screenshot with
 | `Alt+A` | Next unread |
 | `Alt+U` | Show only conversations with unread messages, or everything again (also the button at the top of the sidebar) |
 | `Ctrl+T` | Next team |
-| `↑` on an empty input | Select messages. `Enter` opens the thread, `o` opens the attachment, `y` copies the link, `w` opens it in the browser |
+| `↑` on an empty input | Select messages. `Enter` opens the thread, `e` reacts, `o` opens the attachment, `y` copies the link, `w` opens it in the browser |
+| `+:emoji:` then `Enter` | React to the latest message, e.g. `+:thumbsup:` |
 | `Tab` | Move between sidebar, channel and thread |
 | `Esc` | Close whatever is open |
-| `Ctrl+L` | Lock (once you've set up `mmt lock`) |
+| `Ctrl+L` or `/lock` | Lock (once you've set up `mmt lock`) |
 | `F1` | Everything else |
 
 ### Commands
@@ -109,6 +110,9 @@ already gave it. Anything destructive asks first.
 - `/bot new | list | token | add` and `/token new | list | revoke`
 - `/open` and `/link` open or copy the web link to the current channel or thread
 - `/call` joins the call in the current channel
+- `/upload` opens a small file browser: newest files first, a preview on the
+  right, type to search the folder and everything below it, `Tab` to pick
+  several. `/upload ~/report.pdf` attaches a file directly
 
 New tokens show up once and go straight to your clipboard. They're never posted
 anywhere. Any command mmt doesn't know goes to the server, so `/away`,

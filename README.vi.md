@@ -6,7 +6,7 @@ Mattermost chạy trong terminal.
 
 Mình ngồi trong terminal gần như cả ngày, mỗi lần có người tag lại phải qua
 tab trình duyệt nên thấy phiền, thế là viết cái này. Sidebar giữ nguyên cách
-bạn sắp xếp trên web, thread mở ở panel bên phải, còn nếu dùng iTerm2 thì ảnh
+bạn sắp xếp trên app hay web, thread mở ở panel bên phải, còn nếu dùng iTerm2 thì ảnh
 hiện luôn trong khung chat.
 
 [English](README.md)
@@ -84,10 +84,11 @@ vào cửa sổ để đính kèm.
 | `Alt+A` | Kênh chưa đọc kế tiếp |
 | `Alt+U` | Chỉ hiện hội thoại chưa đọc, hoặc hiện lại tất cả (hoặc bấm nút ở đầu sidebar) |
 | `Ctrl+T` | Đổi team |
-| `↑` khi ô nhập trống | Chọn tin. `Enter` mở thread, `o` mở tệp đính kèm, `y` copy link, `w` mở trên trình duyệt |
+| `↑` khi ô nhập trống | Chọn tin. `Enter` mở thread, `e` thả reaction, `o` mở tệp đính kèm, `y` copy link, `w` mở trên trình duyệt |
+| `+:emoji:` rồi `Enter` | Thả reaction vào tin mới nhất, ví dụ `+:thumbsup:` |
 | `Tab` | Chuyển giữa sidebar, kênh và thread |
 | `Esc` | Đóng cái đang mở |
-| `Ctrl+L` | Khoá app (sau khi đã chạy `mmt lock`) |
+| `Ctrl+L` hoặc `/lock` | Khoá app (sau khi đã chạy `mmt lock`) |
 | `F1` | Xem hết phím tắt |
 
 ### Lệnh
@@ -104,6 +105,9 @@ bỏ qua những gì đã có. Lệnh nào xoá hay thu hồi thì đều hỏi 
 - `/bot new | list | token | add` và `/token new | list | revoke`
 - `/open`, `/link`: mở hoặc copy link web của kênh hay thread đang xem
 - `/call`: vào cuộc gọi trong kênh hiện tại
+- `/upload`: mở một trình duyệt tệp nhỏ, tệp mới nhất lên đầu, bên phải xem
+  trước, gõ để tìm trong thư mục và mọi thư mục con, `Tab` để chọn nhiều tệp.
+  `/upload ~/report.pdf` thì đính kèm thẳng tệp đó
 
 Token mới chỉ hiện một lần và được copy thẳng vào clipboard, không bị đăng lên
 đâu cả. Lệnh nào mmt không biết thì gửi lên server, nên `/away`, `/header`...

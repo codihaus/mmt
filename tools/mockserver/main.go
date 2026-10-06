@@ -17,7 +17,9 @@ import (
 	"image/color"
 	"image/png"
 	"log"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -36,6 +38,7 @@ type server struct {
 	members  []obj
 	posts    map[string][]obj
 	files    map[string][]byte
+	names    map[string]string // uploaded file id -> file name
 	bots     []obj
 	tokens   []obj
 	conns    []*websocket.Conn
@@ -275,8 +278,23 @@ func (s *server) routes() http.Handler {
 	})
 	mux.HandleFunc("GET /api/v4/users/autocomplete", func(w http.ResponseWriter, r *http.Request) {
 		q := strings.ToLower(r.URL.Query().Get("name"))
+		// a channel's members are taken to be me plus whoever posted in it
+		var in map[string]bool
+		if cid := r.URL.Query().Get("in_channel"); cid != "" {
+			in = map[string]bool{me: true}
+			s.mu.Lock()
+			for _, p := range s.posts[cid] {
+				if uid, _ := p["user_id"].(string); uid != "" {
+					in[uid] = true
+				}
+			}
+			s.mu.Unlock()
+		}
 		out := []obj{}
-		for _, u := range s.users {
+		for id, u := range s.users {
+			if in != nil && !in[id] {
+				continue
+			}
 			if strings.HasPrefix(u["username"].(string), q) {
 				out = append(out, u)
 			}
@@ -440,6 +458,10 @@ func (s *server) routes() http.Handler {
 		s.mu.Lock()
 		id := fmt.Sprintf("f%d", len(s.files)+1)
 		s.files[id] = buf.Bytes()
+		if s.names == nil {
+			s.names = map[string]string{}
+		}
+		s.names[id] = hdr.Filename
 		s.mu.Unlock()
 		writeJSON(w, obj{"file_infos": []obj{{"id": id, "name": hdr.Filename, "size": hdr.Size}}})
 	})
@@ -451,6 +473,20 @@ func (s *server) routes() http.Handler {
 	}
 	mux.HandleFunc("GET /api/v4/files/{fid}", serveFile)
 	mux.HandleFunc("GET /api/v4/files/{fid}/preview", serveFile)
+	mux.HandleFunc("POST /api/v4/reactions", func(w http.ResponseWriter, r *http.Request) {
+		var re obj
+		if json.NewDecoder(r.Body).Decode(&re) != nil {
+			http.Error(w, "bad reaction", http.StatusBadRequest)
+			return
+		}
+		re["create_at"] = time.Now().UnixMilli()
+		s.setReaction(re, true)
+		writeJSON(w, re)
+	})
+	mux.HandleFunc("DELETE /api/v4/users/{uid}/posts/{pid}/reactions/{name}", func(w http.ResponseWriter, r *http.Request) {
+		s.setReaction(obj{"user_id": r.PathValue("uid"), "post_id": r.PathValue("pid"), "emoji_name": r.PathValue("name")}, false)
+		writeJSON(w, obj{"status": "OK"})
+	})
 	mux.HandleFunc("GET /api/v4/websocket", s.websocket)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("not implemented:", r.Method, r.URL.Path)
@@ -478,7 +514,12 @@ func (s *server) createPost(w http.ResponseWriter, r *http.Request) {
 	if len(in.FileIDs) > 0 {
 		var files []obj
 		for _, id := range in.FileIDs {
-			files = append(files, obj{"id": id, "name": id + ".png", "mime_type": "image/png"})
+			name := s.names[id]
+			if name == "" {
+				name = id + ".png"
+			}
+			mt, _, _ := strings.Cut(mime.TypeByExtension(filepath.Ext(name)), ";")
+			files = append(files, obj{"id": id, "name": name, "extension": strings.TrimPrefix(filepath.Ext(name), "."), "mime_type": mt})
 		}
 		p["file_ids"] = in.FileIDs
 		p["metadata"] = obj{"files": files}
@@ -565,4 +606,42 @@ func (s *server) demoEvents() {
 		s.mu.Unlock()
 		s.broadcast(ev)
 	}()
+}
+
+// setReaction adds or removes a reaction on a stored post and tells the
+// clients, as the server's reaction_added / reaction_removed events do.
+func (s *server) setReaction(re obj, add bool) {
+	s.mu.Lock()
+	var channel any
+	for _, list := range s.posts {
+		for _, p := range list {
+			if p["id"] != re["post_id"] {
+				continue
+			}
+			channel = p["channel_id"]
+			md, _ := p["metadata"].(obj)
+			if md == nil {
+				md = obj{}
+				p["metadata"] = md
+			}
+			rs, _ := md["reactions"].([]obj)
+			kept := rs[:0:0]
+			for _, x := range rs {
+				if x["user_id"] != re["user_id"] || x["emoji_name"] != re["emoji_name"] {
+					kept = append(kept, x)
+				}
+			}
+			if add {
+				kept = append(kept, re)
+			}
+			md["reactions"] = kept
+		}
+	}
+	s.mu.Unlock()
+	raw, _ := json.Marshal(re)
+	event := "reaction_removed"
+	if add {
+		event = "reaction_added"
+	}
+	s.broadcast(obj{"event": event, "data": obj{"reaction": string(raw)}, "broadcast": obj{"channel_id": channel}})
 }

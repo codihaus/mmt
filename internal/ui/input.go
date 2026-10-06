@@ -32,6 +32,12 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 	if m.shell != nil {
 		return m.shellKey(k)
 	}
+	if m.react != nil {
+		return m.reactKey(k)
+	}
+	if m.files != nil {
+		return m.filesKey(k)
+	}
 	if s == "ctrl+c" {
 		switch {
 		case m.sw != nil:
@@ -155,6 +161,11 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 		case "c":
 			if pn.sel >= 0 && pn.sel < n {
 				return copyCmd(pn.visible[pn.sel].Message)
+			}
+			return nil
+		case "e", "+":
+			if pn.sel >= 0 && pn.sel < n {
+				return m.openReact(pn.visible[pn.sel])
 			}
 			return nil
 		case "y", "w":
@@ -368,7 +379,7 @@ func (m *Model) maybeLoadOlder() tea.Cmd {
 // ---- mouse ----
 
 func (m *Model) handleMouse(ev tea.MouseMsg) tea.Cmd {
-	if !m.ready || m.sw != nil || m.showHelp || m.wiz != nil || m.result != nil || m.shell != nil {
+	if !m.ready || m.sw != nil || m.showHelp || m.wiz != nil || m.result != nil || m.shell != nil || m.react != nil || m.files != nil {
 		return nil
 	}
 	g := m.geo()
@@ -516,6 +527,8 @@ var localCommands = []command{
 	{"/open", "", "Open the current channel or thread in the browser"},
 	{"/link", "", "Copy the web link of the current channel or thread"},
 	{"/call", "", "Join or start a call in the browser"},
+	{"/upload", "[path]", "Pick files to attach in a file browser"},
+	{"/lock", "", "Lock mmt now (same as Ctrl+L)"},
 	{"/unreads", "", "Show only conversations with unread messages, or all again"},
 	{"/help", "", "Show shortcuts"},
 	{"/quit", "", "Quit mmt"},
@@ -568,10 +581,14 @@ func (m *Model) updateSugs() tea.Cmd {
 		}
 		m.sugFor = tok
 		term := tok[1:]
+		channel, team := m.cur, ""
+		if it := m.items[channel]; it != nil {
+			team = it.ch.TeamId
+		}
 		return func() tea.Msg {
 			cx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
-			users, err := m.c.Autocomplete(cx, term)
+			users, err := m.c.AutocompleteInChannel(cx, team, channel, term)
 			if err != nil {
 				return nil
 			}
@@ -637,6 +654,15 @@ func (m *Model) runCommand(text string) tea.Cmd {
 		return m.openCallCmd(m.cur)
 	case "/unreads":
 		return m.toggleUnreads()
+	case "/lock":
+		if !m.lockEnabled() {
+			m.setStatus(tr("No lock set up yet; run `mmt lock` in a terminal first"), true)
+			return nil
+		}
+		return m.lockNow()
+	case "/upload":
+		_, arg, _ := strings.Cut(text, " ")
+		return m.startUpload(arg)
 	case "/open":
 		if u := m.currentURL(); u != "" {
 			return m.openURLCmd(u)

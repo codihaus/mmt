@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/charmbracelet/x/ansi"
 	"github.com/mattermost/mattermost/server/public/model"
@@ -28,6 +30,12 @@ var skinTone = regexp.MustCompile(`_tone[1-5]$`)
 // emojiGlyph turns an emoji name into its character; custom emoji stay as
 // :name: since the terminal cannot draw them.
 func emojiGlyph(name string) string {
+	// the server's own table first: its names are the ones reactions use
+	if hex, ok := model.SystemEmojis[name]; ok {
+		if g := glyphFromHex(hex); g != "" {
+			return g
+		}
+	}
 	base := skinTone.ReplaceAllString(name, "")
 	if a, ok := emojiAliases[base]; ok {
 		base = a
@@ -36,6 +44,19 @@ func emojiGlyph(name string) string {
 		return string(e.Unicode)
 	}
 	return ":" + name + ":"
+}
+
+// glyphFromHex turns "1f44d" or "2764-fe0f" into the characters.
+func glyphFromHex(hex string) string {
+	var b strings.Builder
+	for _, part := range strings.Split(hex, "-") {
+		r, err := strconv.ParseUint(part, 16, 32)
+		if err != nil {
+			return ""
+		}
+		b.WriteRune(rune(r))
+	}
+	return b.String()
 }
 
 // reactionLines groups a post's reactions as "👍 2  ✅ 1", wrapped to width.

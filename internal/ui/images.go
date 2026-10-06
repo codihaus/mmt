@@ -152,7 +152,7 @@ func (m *Model) onImage(msg imgMsg) {
 // hash of the rows under the images is included so the line (and with it the
 // images) is only re-sent when those rows change.
 func (m *Model) imageOverlay(g geo, screen []string) string {
-	if !inlineImages || m.sw != nil || m.showHelp {
+	if !inlineImages || m.sw != nil || m.showHelp || m.react != nil {
 		return ""
 	}
 	var esc strings.Builder

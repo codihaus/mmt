@@ -170,6 +170,9 @@ func (m *Model) renderPosts(k paneKind, width int) string {
 			block, link = m.callLines(p)
 			links = []string{link, link}
 		}
+		cards, cardLinks := m.cardLines(p, inner)
+		block = append(block, cards...)
+		links = append(links, cardLinks...)
 		files, fileLinks, fileImgs := m.attachmentLines(p, inner)
 		var imgs map[int]imgRef
 		for i, r := range fileImgs {
@@ -321,6 +324,10 @@ func (m *Model) formatMessage(p *model.Post, width int, sys bool) []string {
 		text = p.Type
 	}
 	if !sys {
+		if strings.TrimSpace(text) == "" {
+			// only attachments or files; they are drawn below
+			return nil
+		}
 		text = replaceEmoticons(text)
 	}
 	var out []string
@@ -515,6 +522,10 @@ func (m *Model) viewFooter() string {
 		parts = []string{"Esc close"}
 	case m.shell != nil:
 		parts = []string{"Enter send output", "c copy", "Esc close"}
+	case m.react != nil:
+		parts = []string{"1-8 or ↑↓ Enter react", "type to search", "Esc close"}
+	case m.files != nil:
+		parts = []string{"↑↓ move", "Enter open folder / attach", "Tab mark", "← parent folder", "~ home", "type to search", "Esc close"}
 	case m.focus == focusInput && strings.HasPrefix(m.input.Value(), "!"):
 		parts = []string{"Enter runs this on your computer (not sent to the chat)", "\\! sends a message starting with !"}
 	case m.wiz != nil:
@@ -526,9 +537,9 @@ func (m *Model) viewFooter() string {
 	case m.focus == focusSidebar:
 		parts = []string{"↑↓ move", "Enter open channel", "Tab/Esc back to input"}
 	case m.focus == focusSelect && m.active == paneThread:
-		parts = []string{"↑↓ select message", "Enter reply", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
+		parts = []string{"↑↓ select message", "Enter reply", "e react", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
 	case m.focus == focusSelect:
-		parts = []string{"↑↓ select message", "Enter open thread", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
+		parts = []string{"↑↓ select message", "Enter open thread", "e react", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
 	case len(m.sugs) > 0:
 		parts = []string{"↑↓ select", "Tab/Enter complete", "Esc dismiss"}
 	case m.active == paneThread:
@@ -560,9 +571,12 @@ func helpBox() string {
 		{"Click a section", "Collapse or expand a sidebar section"},
 		{"Ctrl+V", "Paste an image from the clipboard"},
 		{"Drop a file", "Attach it"},
+		{"/upload", "Pick files to attach in a file browser"},
 		{"Click [image]/[file]/link", "Open in the browser"},
 		{"o (message selected)", "Open attachments with the default app"},
 		{"c (message selected)", "Copy the message text"},
+		{"e (message selected)", "Add or remove a reaction"},
+		{"+:emoji:", "React to the latest message, e.g. +:thumbsup:"},
 		{"y / w (message selected)", "Copy link / open the message on the web"},
 		{"Drag over messages", "Select text; it is copied on release"},
 		{"/link  /open", "Copy link / open the channel or thread on the web"},
@@ -576,7 +590,7 @@ func helpBox() string {
 		{"Esc", "Close popup or thread"},
 		{"@ / ~ / /", "Suggest people / channels / commands"},
 		{"/dm @user", "Open a direct message"},
-		{"Ctrl+L", "Lock mmt (Touch ID or passcode; set up with mmt lock)"},
+		{"Ctrl+L / /lock", "Lock mmt (Touch ID or passcode; set up with mmt lock)"},
 		{"Ctrl+C", "Clear the input; again to quit"},
 	}
 	var b strings.Builder

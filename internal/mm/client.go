@@ -250,6 +250,18 @@ func (c *Client) File(ctx context.Context, id string) ([]byte, error) {
 	return data, err
 }
 
+// React adds the emoji to a post as the current user; on is false to take
+// it back.
+func (c *Client) React(ctx context.Context, postID, emoji string, on bool) error {
+	r := &model.Reaction{UserId: c.Me.Id, PostId: postID, EmojiName: emoji}
+	if on {
+		_, _, err := c.API.SaveReaction(ctx, r)
+		return err
+	}
+	_, err := c.API.DeleteReaction(ctx, r)
+	return err
+}
+
 func (c *Client) View(ctx context.Context, channelID, prevID string) error {
 	_, _, err := c.API.ViewChannel(ctx, c.Me.Id, &model.ChannelView{ChannelId: channelID, PrevChannelId: prevID})
 	return err
@@ -272,6 +284,17 @@ func (c *Client) OpenDM(ctx context.Context, username string) (*model.Channel, e
 
 func (c *Client) Autocomplete(ctx context.Context, term string) ([]*model.User, error) {
 	res, _, err := c.API.AutocompleteUsers(ctx, term, 8, "")
+	if err != nil {
+		return nil, err
+	}
+	c.addUsers(res.Users)
+	return res.Users, nil
+}
+
+// AutocompleteInChannel suggests only members of the channel, so a message
+// cannot mention someone who will never see it.
+func (c *Client) AutocompleteInChannel(ctx context.Context, teamID, channelID, term string) ([]*model.User, error) {
+	res, _, err := c.API.AutocompleteUsersInChannel(ctx, teamID, channelID, term, 8, "")
 	if err != nil {
 		return nil, err
 	}
