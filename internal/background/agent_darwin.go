@@ -21,7 +21,7 @@ import (
 
 const label = "io.github.codihaus.mmt"
 
-// icon is docs/icon.svg as an .icns; `make icon` rebuilds it.
+// icon is docs/assets/icon.svg as an .icns; `make icon` rebuilds it.
 //
 //go:embed mmt.icns
 var icon []byte

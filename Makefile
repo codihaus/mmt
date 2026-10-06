@@ -39,20 +39,20 @@ video: build
 		MMT_URL=http://127.0.0.1:8065 MMT_TOKEN=demo MMT_LANG=en ./mmt --here; \
 	fi
 
-# Rebuild the app icon from docs/icon.svg (renders with Google Chrome).
+# Rebuild the app icon from docs/assets/icon.svg (renders with Google Chrome).
 icon:
 	@tmp=$$(mktemp -d) && \
 	"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu \
 		--hide-scrollbars --default-background-color=00000000 --window-size=1024,1024 \
-		--screenshot=$$tmp/icon.png "file://$(CURDIR)/docs/icon.svg" 2>/dev/null && \
+		--screenshot=$$tmp/icon.png "file://$(CURDIR)/docs/assets/icon.svg" 2>/dev/null && \
 	mkdir $$tmp/mmt.iconset && \
 	for s in 16 32 128 256 512; do \
 		sips -z $$s $$s $$tmp/icon.png --out $$tmp/mmt.iconset/icon_$${s}x$${s}.png >/dev/null; \
 		sips -z $$((s*2)) $$((s*2)) $$tmp/icon.png --out $$tmp/mmt.iconset/icon_$${s}x$${s}@2x.png >/dev/null; \
 	done && \
 	iconutil -c icns $$tmp/mmt.iconset -o internal/background/mmt.icns && \
-	sips -z 256 256 $$tmp/icon.png --out docs/icon.png >/dev/null && \
-	echo "wrote internal/background/mmt.icns and docs/icon.png"
+	sips -z 256 256 $$tmp/icon.png --out docs/assets/icon.png >/dev/null && \
+	echo "wrote internal/background/mmt.icns and docs/assets/icon.png"
 
 # Release archives in dist/: a universal macOS binary (needs a Mac, for cgo),
 # Linux and Windows builds. make release VERSION=v0.2.0

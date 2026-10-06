@@ -1,4 +1,4 @@
-<img src="docs/icon.png" width="96" align="right" alt="">
+<img src="docs/assets/icon.png" width="96" align="right" alt="">
 
 # mmt
 
@@ -11,7 +11,7 @@ hiện luôn trong khung chat.
 
 [English](README.md)
 
-![mmt: sidebar, kênh đang mở và một tin nhắc tên](docs/screenshot.png)
+![mmt: sidebar, kênh đang mở và một tin nhắc tên](docs/assets/screenshot.png)
 
 App còn mới. Ngày nào mình cũng dùng với server thật, nhưng chắc chắn vẫn còn
 chỗ chưa mượt, gặp lỗi thì cứ mở issue nhé.

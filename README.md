@@ -1,4 +1,4 @@
-<img src="docs/icon.png" width="96" align="right" alt="">
+<img src="docs/assets/icon.png" width="96" align="right" alt="">
 
 # mmt
 
@@ -11,7 +11,7 @@ images inline if you're on iTerm2.
 
 [Tiếng Việt](README.vi.md)
 
-![mmt with the sidebar, a channel and a mention](docs/screenshot.png)
+![mmt with the sidebar, a channel and a mention](docs/assets/screenshot.png)
 
 It's young. I use it every day against a real server, but expect rough edges,
 and please open an issue when you hit one.
