@@ -11,7 +11,10 @@ hiện luôn trong khung chat.
 
 [English](README.md)
 
-![mmt: sidebar, kênh đang mở và một tin nhắc tên](docs/assets/screenshot.png)
+[![mmt: sidebar, kênh đang mở và một tin nhắc tên](docs/assets/screenshot.png)](https://codihaus.github.io/mmt/)
+
+Muốn xem app chạy thế nào trước khi cài thì vào [trang giới thiệu mmt](https://codihaus.github.io/mmt/),
+mỗi tính năng có một đoạn GIF ngắn.
 
 App còn mới. Ngày nào mình cũng dùng với server thật, nhưng chắc chắn vẫn còn
 chỗ chưa mượt, gặp lỗi thì cứ mở issue nhé.

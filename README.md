@@ -11,7 +11,10 @@ images inline if you're on iTerm2.
 
 [Tiếng Việt](README.vi.md)
 
-![mmt with the sidebar, a channel and a mention](docs/assets/screenshot.png)
+[![mmt with the sidebar, a channel and a mention](docs/assets/screenshot.png)](https://codihaus.github.io/mmt/)
+
+Each feature has a short recording on the [mmt page](https://codihaus.github.io/mmt/),
+if you'd like to see it move before installing anything.
 
 It's young. I use it every day against a real server, but expect rough edges,
 and please open an issue when you hit one.
