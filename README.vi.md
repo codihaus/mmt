@@ -87,7 +87,7 @@ vào cửa sổ để đính kèm.
 | `Alt+A` | Kênh chưa đọc kế tiếp |
 | `Alt+U` | Chỉ hiện hội thoại chưa đọc, hoặc hiện lại tất cả (hoặc bấm nút ở đầu sidebar) |
 | `Ctrl+T` | Đổi team |
-| `↑` khi ô nhập trống | Chọn tin. `Enter` mở thread, `e` thả reaction, `o` mở tệp đính kèm, `y` copy link, `w` mở trên trình duyệt |
+| `↑` khi ô nhập trống | Chọn tin. `Enter` mở thread, `e` thả reaction, `d` rồi `Enter` xoá tin của mình, `o` mở tệp đính kèm, `y` copy link, `w` mở trên trình duyệt |
 | `+:emoji:` rồi `Enter` | Thả reaction vào tin mới nhất, ví dụ `+:thumbsup:` |
 | `Tab` | Chuyển giữa sidebar, kênh và thread |
 | `Esc` | Đóng cái đang mở |

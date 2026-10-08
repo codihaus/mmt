@@ -487,6 +487,42 @@ func (s *server) routes() http.Handler {
 		s.setReaction(obj{"user_id": r.PathValue("uid"), "post_id": r.PathValue("pid"), "emoji_name": r.PathValue("name")}, false)
 		writeJSON(w, obj{"status": "OK"})
 	})
+	mux.HandleFunc("DELETE /api/v4/posts/{pid}", func(w http.ResponseWriter, r *http.Request) {
+		pid := r.PathValue("pid")
+		var gone obj
+		s.mu.Lock()
+		for _, ps := range s.posts {
+			for _, p := range ps {
+				if p["id"] == pid {
+					gone = p
+				}
+			}
+		}
+		// "#keep" in a message lets a demo show what a refused delete looks like
+		ok := gone != nil && !strings.Contains(gone["message"].(string), "#keep")
+		if ok {
+			for cid, ps := range s.posts {
+				kept := ps[:0]
+				for _, p := range ps {
+					if p["id"] != pid && p["root_id"] != pid {
+						kept = append(kept, p)
+					}
+				}
+				s.posts[cid] = kept
+			}
+		}
+		s.mu.Unlock()
+		switch {
+		case gone == nil:
+			http.Error(w, `{"message":"post not found"}`, http.StatusNotFound)
+		case !ok:
+			http.Error(w, `{"message":"You do not have the appropriate permissions."}`, http.StatusForbidden)
+		default:
+			raw, _ := json.Marshal(gone)
+			s.broadcast(obj{"event": "post_deleted", "broadcast": obj{"channel_id": gone["channel_id"]}, "data": obj{"post": string(raw)}})
+			writeJSON(w, obj{"status": "OK"})
+		}
+	})
 	mux.HandleFunc("GET /api/v4/websocket", s.websocket)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("not implemented:", r.Method, r.URL.Path)

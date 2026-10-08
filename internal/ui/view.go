@@ -93,7 +93,7 @@ func (m *Model) renderPosts(k paneKind, width int) string {
 	emit := func(p *model.Post, ls []string, own bool, link string) {
 		gutter := "  "
 		if p != nil && p == selPost && !own {
-			gutter = stGutter.Render("▌ ")
+			gutter = m.selMarker(p)
 		}
 		start := len(lines)
 		for _, l := range ls {
@@ -187,6 +187,12 @@ func (m *Model) renderPosts(k paneKind, width int) string {
 			block = append(block, stErr.Render(tr("(failed to send)")))
 		}
 		block = append(block, m.reactionLines(p, inner)...)
+		if m.armed(p) {
+			// struck through in red until the second d, or any other key
+			for i, l := range block {
+				block[i] = stDel.Render(ansi.Strip(l))
+			}
+		}
 		if !inThread && p.RootId == "" && p.ReplyCount > 0 {
 			block = append(block, stAccent.Render(fmt.Sprintf(tr("↳ %d replies"), p.ReplyCount)))
 		}
@@ -301,11 +307,20 @@ func (m *Model) frame(b *bubble, maxInner int, inThread bool, bw int, sel *model
 		// the selection marker hugs the right-aligned frame instead of the far edge
 		for i := range rows {
 			if rows[i].post == sel {
-				rows[i].text = indent[:len(indent)-2] + stGutter.Render("▌ ") + rows[i].text[len(indent):]
+				rows[i].text = indent[:len(indent)-2] + m.selMarker(sel) + rows[i].text[len(indent):]
 			}
 		}
 	}
 	return rows
+}
+
+// selMarker is the bar beside the selected message, red while it waits to
+// be deleted.
+func (m *Model) selMarker(p *model.Post) string {
+	if m.armed(p) {
+		return stErr.Render("▌ ")
+	}
+	return stGutter.Render("▌ ")
 }
 
 func (m *Model) mentionsMe(posts []*model.Post) bool {
@@ -536,10 +551,12 @@ func (m *Model) viewFooter() string {
 		parts = []string{"Esc close"}
 	case m.focus == focusSidebar:
 		parts = []string{"↑↓ move", "Enter open channel", "Tab/Esc back to input"}
+	case m.delArm != "":
+		return ansi.Truncate(stErr.Render(" "+m.delAsk), m.w, "…")
 	case m.focus == focusSelect && m.active == paneThread:
-		parts = []string{"↑↓ select message", "Enter reply", "e react", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
+		parts = []string{"↑↓ select message", "Enter reply", "e react", "d delete", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
 	case m.focus == focusSelect:
-		parts = []string{"↑↓ select message", "Enter open thread", "e react", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
+		parts = []string{"↑↓ select message", "Enter open thread", "e react", "d delete", "c copy", "o open file", "y copy link", "w open on web", "Esc back to input"}
 	case len(m.sugs) > 0:
 		parts = []string{"↑↓ select", "Tab/Enter complete", "Esc dismiss"}
 	case m.active == paneThread:
@@ -576,6 +593,7 @@ func helpBox() string {
 		{"o (message selected)", "Open attachments with the default app"},
 		{"c (message selected)", "Copy the message text"},
 		{"e (message selected)", "Add or remove a reaction"},
+		{"d then Enter (message selected)", "Delete your message"},
 		{"+:emoji:", "React to the latest message, e.g. +:thumbsup:"},
 		{"y / w (message selected)", "Copy link / open the message on the web"},
 		{"Drag over messages", "Select text; it is copied on release"},

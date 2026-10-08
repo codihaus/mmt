@@ -110,6 +110,8 @@ type Model struct {
 	lastInput time.Time    // last key or mouse event, for the idle lock
 	shell     *shellView   // a !command and its output
 	react     *reactPicker // emoji picker for a reaction
+	delArm    string       // id (or pending id) of the message waiting for Enter to delete
+	delAsk    string       // the footer question while delArm is set
 	files     *filePicker  // file picker for /upload
 	uploadDir string       // where the file picker opened last
 	wiz       *wizard      // management command form
@@ -1107,6 +1109,10 @@ func (m *Model) update(msg tea.Msg) tea.Cmd {
 
 	case walkedMsg:
 		m.onWalked(msg)
+		return nil
+
+	case deletedMsg:
+		m.onDeleted(msg)
 		return nil
 
 	case autoMsg:

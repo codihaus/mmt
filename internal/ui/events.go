@@ -62,7 +62,7 @@ func (m *Model) handleEvent(ev *model.WebSocketEvent) tea.Cmd {
 			return nil
 		}
 		if b := m.bufs[p.ChannelId]; b != nil {
-			b.posts = remove(b.posts, p.Id)
+			b.posts, _ = removeWithReplies(b.posts, p.Id)
 		}
 		if m.thread != nil {
 			if p.Id == m.thread.root {

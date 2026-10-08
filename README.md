@@ -91,7 +91,7 @@ thread, scroll with the wheel, drag to select text. Paste a screenshot with
 | `Alt+A` | Next unread |
 | `Alt+U` | Show only conversations with unread messages, or everything again (also the button at the top of the sidebar) |
 | `Ctrl+T` | Next team |
-| `↑` on an empty input | Select messages. `Enter` opens the thread, `e` reacts, `o` opens the attachment, `y` copies the link, `w` opens it in the browser |
+| `↑` on an empty input | Select messages. `Enter` opens the thread, `e` reacts, `d` then `Enter` deletes your message, `o` opens the attachment, `y` copies the link, `w` opens it in the browser |
 | `+:emoji:` then `Enter` | React to the latest message, e.g. `+:thumbsup:` |
 | `Tab` | Move between sidebar, channel and thread |
 | `Esc` | Close whatever is open |

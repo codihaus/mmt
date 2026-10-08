@@ -38,6 +38,12 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 	if m.files != nil {
 		return m.filesKey(k)
 	}
+	if m.delArm != "" && !(m.focus == focusSelect && (isDeleteKey(s) || s == "enter")) {
+		m.disarm()
+		if s == "esc" {
+			return nil // cancel only; the message stays selected
+		}
+	}
 	if s == "ctrl+c" {
 		switch {
 		case m.sw != nil:
@@ -168,6 +174,11 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 				return m.openReact(pn.visible[pn.sel])
 			}
 			return nil
+		case "d", "đ", "D", "Đ", "backspace", "delete":
+			if pn.sel >= 0 && pn.sel < n {
+				return m.deleteKey(pn.visible[pn.sel], false)
+			}
+			return nil
 		case "y", "w":
 			if pn.sel >= 0 && pn.sel < n && pn.visible[pn.sel].Id != "" {
 				url := m.permalink(pn.visible[pn.sel])
@@ -178,6 +189,9 @@ func (m *Model) handleKey(k tea.KeyMsg) tea.Cmd {
 			}
 			return nil
 		case "enter", "r":
+			if m.delArm != "" && pn.sel >= 0 && pn.sel < n {
+				return m.deleteKey(pn.visible[pn.sel], true)
+			}
 			if pn.sel >= 0 && pn.sel < n {
 				if m.active == paneThread {
 					m.focus = focusInput

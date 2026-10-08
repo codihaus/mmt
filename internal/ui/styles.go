@@ -24,6 +24,7 @@ var (
 
 	stDim     = lipgloss.NewStyle().Foreground(colDim)
 	stErr     = lipgloss.NewStyle().Foreground(colErr)
+	stDel     = lipgloss.NewStyle().Foreground(colErr).Strikethrough(true)
 	stOK      = lipgloss.NewStyle().Foreground(colOK)
 	stAccent  = lipgloss.NewStyle().Foreground(colAccent)
 	stMention = lipgloss.NewStyle().Bold(true).Foreground(colMention)

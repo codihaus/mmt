@@ -262,6 +262,11 @@ func (c *Client) React(ctx context.Context, postID, emoji string, on bool) error
 	return err
 }
 
+func (c *Client) DeletePost(ctx context.Context, postID string) error {
+	_, err := c.API.DeletePost(ctx, postID)
+	return err
+}
+
 func (c *Client) View(ctx context.Context, channelID, prevID string) error {
 	_, _, err := c.API.ViewChannel(ctx, c.Me.Id, &model.ChannelView{ChannelId: channelID, PrevChannelId: prevID})
 	return err
