@@ -170,7 +170,8 @@ screen, zellij or an SSH session.
 `mmt lock` sets up a lock that's separate from your Mattermost login: Touch ID
 with a passcode fallback, or a passcode only. After that mmt asks before
 showing anything, `Ctrl+L` locks it right away, and it locks itself after
-however many idle minutes you choose. Notifications only say "New message"
+however many idle minutes you choose. The lock screen asks for the passcode;
+`Esc` brings up Touch ID, so no system dialog pops up on an idle screen. Notifications only say "New message"
 while it's locked. The passcode is kept as a PBKDF2 hash in the keychain.
 
 ## Config

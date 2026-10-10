@@ -164,7 +164,8 @@ SSH thì app không tự chuyển đi đâu.
 `mmt lock` đặt một lớp khoá riêng, không liên quan tới đăng nhập Mattermost:
 Touch ID kèm mật khẩu dự phòng, hoặc chỉ mật khẩu. Từ đó mmt hỏi trước khi
 hiện bất cứ thứ gì, `Ctrl+L` khoá ngay, và app tự khoá sau số phút không dùng
-mà bạn chọn. Lúc khoá, thông báo chỉ ghi "Tin nhắn mới". Mật khẩu được lưu
+mà bạn chọn. Màn hình khoá hỏi mật khẩu; bấm `Esc` mới hiện Touch ID, nên không
+có hộp thoại hệ thống tự bật lên khi máy đang để không. Lúc khoá, thông báo chỉ ghi "Tin nhắn mới". Mật khẩu được lưu
 dạng băm PBKDF2 trong keychain.
 
 ## Cấu hình

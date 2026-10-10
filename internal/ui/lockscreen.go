@@ -12,8 +12,11 @@ import (
 )
 
 // The app lock hides everything behind a lock screen: on Ctrl+L, or after
-// the configured idle time. It opens with Touch ID or the mmt passcode,
-// independent of the Mattermost session, which keeps running underneath.
+// the configured idle time. It opens with the mmt passcode, or Touch ID on
+// Esc, independent of the Mattermost session, which keeps running
+// underneath. Touch ID never prompts by itself: a system dialog popping up
+// on an idle screen interrupts whatever is in front and shows that mmt is
+// running.
 
 type lockState struct {
 	ti   textinput.Model
@@ -41,7 +44,7 @@ func (m *Model) lockNow() tea.Cmd {
 	m.lock = &lockState{ti: ti}
 	m.sw, m.wiz, m.result, m.textSel = nil, nil, nil, nil
 	m.input.Blur()
-	return tea.Batch(textinput.Blink, m.touchIDCmd())
+	return textinput.Blink
 }
 
 func (m *Model) touchIDCmd() tea.Cmd {
