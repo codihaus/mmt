@@ -22,7 +22,8 @@ chỗ chưa mượt, gặp lỗi thì cứ mở issue nhé.
 ## Cài đặt
 
 Tải file nén hợp với máy ở [trang releases](https://github.com/codihaus/mmt/releases).
-Bản macOS chạy được cả Mac chip Apple lẫn Intel.
+Bản macOS chạy được cả Mac chip Apple lẫn Intel. Mỗi bản thay đổi gì thì xem
+[CHANGELOG.md](CHANGELOG.md).
 
 ```sh
 tar -xzf mmt-macos-*.tar.gz && sh mmt-macos/install.sh
@@ -79,11 +80,11 @@ Dùng chuột được: click kênh để mở, click hai lần vào tin để m
 chuột để cuộn, kéo để bôi chọn chữ. `Ctrl+V` dán ảnh chụp màn hình, kéo file
 vào cửa sổ để đính kèm.
 
-| Phím | |
 Dòng kẻ dưới tên kênh liệt kê các hội thoại khác có tin chưa đọc, mới nhất
 trước, chỉ hiện tên ngắn và số lần được nhắc tên. Kênh đã cuộn khuất khỏi
 sidebar vẫn hiện ở đây. Click vào tên là mở hội thoại đó.
 
+| Phím | |
 | --- | --- |
 | `Enter` / `Shift+Enter` | Gửi / xuống dòng. Terminal nào không nhận `Shift+Enter` thì gõ `\` rồi `Enter` |
 | `Ctrl+K` | Tìm kênh hoặc người |

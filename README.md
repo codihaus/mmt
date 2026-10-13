@@ -23,7 +23,8 @@ and please open an issue when you hit one.
 
 Grab the archive for your machine from the
 [releases page](https://github.com/codihaus/mmt/releases). The macOS one works
-on both Apple silicon and Intel.
+on both Apple silicon and Intel. [CHANGELOG.md](CHANGELOG.md) lists what
+changed in each release.
 
 ```sh
 tar -xzf mmt-macos-*.tar.gz && sh mmt-macos/install.sh
@@ -83,11 +84,11 @@ The mouse works. Click a channel to open it, click a message twice to open its
 thread, scroll with the wheel, drag to select text. Paste a screenshot with
 `Ctrl+V` or drop a file on the window to attach it.
 
-| Key | |
 The line under the channel name lists every other conversation with unread
 messages, newest first, with a short name and the mention count. A channel
 scrolled out of the sidebar still shows up there. Click a name to open it.
 
+| Key | |
 | --- | --- |
 | `Enter` / `Shift+Enter` | Send / new line. If your terminal eats `Shift+Enter`, type `\` then `Enter` |
 | `Ctrl+K` | Find a channel or person |
