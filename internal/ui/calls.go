@@ -20,20 +20,8 @@ const (
 	callEventPref = "custom_com.mattermost.calls_"
 )
 
-// callURL is where a call is joined in the browser: the Calls plugin's own
-// call window when one is running, else the channel, to start one there.
-func (m *Model) callURL(channelID string) string {
-	it := m.items[channelID]
-	if it == nil {
-		return ""
-	}
-	if m.activeCall(channelID) {
-		return mm.CallURL(m.c.Server(), m.teamName(it.ch.TeamId), channelID)
-	}
-	return m.channelURL(it)
-}
-
-// joinCallURL is the call window for a card that shows a running call.
+// joinCallURL opens the channel in the browser and joins its call; with no
+// call running, the Calls plugin starts one and joins it.
 func (m *Model) joinCallURL(channelID string) string {
 	it := m.items[channelID]
 	if it == nil {
@@ -43,11 +31,15 @@ func (m *Model) joinCallURL(channelID string) string {
 }
 
 func (m *Model) openCallCmd(channelID string) tea.Cmd {
-	u := m.callURL(channelID)
+	u := m.joinCallURL(channelID)
 	if u == "" {
 		return nil
 	}
-	m.setStatus(tr("Calls need audio; opening the channel in the browser to join"), false)
+	if m.activeCall(channelID) {
+		m.setStatus(tr("Joining the call in the browser"), false)
+	} else {
+		m.setStatus(tr("Starting a call in the browser"), false)
+	}
 	return m.openURLCmd(u)
 }
 

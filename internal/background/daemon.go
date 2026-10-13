@@ -266,7 +266,7 @@ func (a *agent) open(channel, url string) {
 	}
 }
 
-// webURL is the Calls window for a channel, which joins its call.
+// webURL opens a channel in the browser and joins its call.
 func (a *agent) webURL(cx context.Context, channelID string) string {
 	teams, _, err := a.c.API.GetTeamsForUser(cx, a.c.Me.Id, "")
 	if err != nil || len(teams) == 0 {

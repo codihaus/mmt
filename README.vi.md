@@ -107,7 +107,7 @@ bỏ qua những gì đã có. Lệnh nào xoá hay thu hồi thì đều hỏi 
 - `/user @ai-do`
 - `/bot new | list | token | add` và `/token new | list | revoke`
 - `/open`, `/link`: mở hoặc copy link web của kênh hay thread đang xem
-- `/call`: vào cuộc gọi trong kênh hiện tại
+- `/call`: vào cuộc gọi trong kênh hiện tại, chưa có thì bắt đầu gọi
 - `/upload`: mở một trình duyệt tệp nhỏ, tệp mới nhất lên đầu, bên phải xem
   trước, gõ để tìm trong thư mục và mọi thư mục con, `Tab` để chọn nhiều tệp.
   `/upload ~/report.pdf` thì đính kèm thẳng tệp đó
@@ -130,7 +130,7 @@ gõ `\!`.
 Terminal không có âm thanh nên mmt không cố làm phần này. Cuộc gọi hiện thành
 thẻ, có người gọi riêng thì có thông báo. Click vào thẻ, vào thông báo hoặc gõ
 `/call` là vào thẳng cuộc gọi trên trình duyệt. Kênh chưa có cuộc gọi thì
-`/call` mở kênh đó để bạn bắt đầu gọi.
+`/call` bắt đầu cuộc gọi và vào luôn.
 
 ### Thông báo khi đã tắt mmt
 

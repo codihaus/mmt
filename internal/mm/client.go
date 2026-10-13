@@ -36,10 +36,12 @@ func New(server, token string) *Client {
 
 func (c *Client) Server() string { return c.server }
 
-// CallURL opens the Calls plugin's call window for a channel, which joins
-// the running call. Any team the user is in works for a DM.
+// CallURL opens a channel with the Calls plugin's join_call flag, which
+// joins the running call on load, as the web app's /call link does. The
+// plugin's expanded window cannot join: it only shows a call its opener has
+// joined. Any team the user is in works for a DM.
 func CallURL(server, team, channelID string) string {
-	return server + "/" + team + "/com.mattermost.calls/expanded/" + channelID
+	return server + "/" + team + "/channels/" + channelID + "?join_call=true"
 }
 
 // Login exchanges username/password (and optional MFA code) for a session token.

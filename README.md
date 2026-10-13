@@ -112,7 +112,7 @@ already gave it. Anything destructive asks first.
 - `/user @someone`
 - `/bot new | list | token | add` and `/token new | list | revoke`
 - `/open` and `/link` open or copy the web link to the current channel or thread
-- `/call` joins the call in the current channel
+- `/call` joins the call in the current channel, or starts one
 - `/upload` opens a small file browser: newest files first, a preview on the
   right, type to search the folder and everything below it, `Tab` to pick
   several. `/upload ~/report.pdf` attaches a file directly
@@ -135,7 +135,7 @@ seconds is stopped. To send a message that really starts with `!`, write `\!`.
 A terminal can't do audio, so mmt doesn't try. Calls show up as cards, you get
 a notification when someone calls you in a DM, and clicking the card, the
 notification or typing `/call` joins the call in your browser. With no call
-running, `/call` opens the channel so you can start one there.
+running, `/call` starts one and joins it.
 
 ### Notifications when mmt is closed
 
