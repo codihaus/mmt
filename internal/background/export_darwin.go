@@ -12,12 +12,12 @@ import (
 	"os"
 )
 
-var onClick func(channel, url string)
+var onClick func(channel, url, app string)
 
 //export mmtClicked
-func mmtClicked(channel, url *C.char) {
+func mmtClicked(channel, url, app *C.char) {
 	if onClick != nil {
-		go onClick(C.GoString(channel), C.GoString(url))
+		go onClick(C.GoString(channel), C.GoString(url), C.GoString(app))
 	}
 }
 

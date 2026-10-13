@@ -147,7 +147,9 @@ This starts a small background agent (a LaunchAgent, so it comes back after
 a reboot) that stays connected and shows a macOS notification for mentions,
 DMs and incoming calls even when no mmt window is open. Click one and mmt
 opens on that channel. While mmt is open the agent keeps quiet, so you never
-get the same message twice. macOS asks once whether mmt may send
+get the same message twice. In Terminal.app it also shows the open window's
+notifications, so clicking one brings Terminal back; without the agent mmt
+only rings the bell there. macOS asks once whether mmt may send
 notifications; say yes. `mmt background status` tells you if it's running,
 and `mmt background off` removes it. `mmt setup` asks about this too.
 

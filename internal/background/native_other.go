@@ -11,11 +11,11 @@ const nativeNotifications = false
 
 // runMain blocks forever. Without Cocoa there is no event loop to run and
 // notifications cannot be clicked.
-func runMain(func(channel, url string)) {
+func runMain(func(channel, url, app string)) {
 	select {}
 }
 
-func show(title, body, _, _ string) {
+func show(title, body, _, _, _ string) {
 	if runtime.GOOS != "linux" {
 		return
 	}

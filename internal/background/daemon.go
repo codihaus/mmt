@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -46,6 +47,7 @@ func Run(exe string) error {
 	}
 	a := &agent{exe: exe}
 	go a.loop()
+	go serveRelay(a.relayed)
 	runMain(a.open)
 	return nil
 }
@@ -227,13 +229,30 @@ func (a *agent) notify(title, body, channel, url string) {
 	if r := []rune(body); len(r) > 200 {
 		body = string(r[:200]) + "…"
 	}
-	show(title, body, channel, url)
+	show(title, body, channel, url, "")
 }
 
-// open is called when a notification is clicked: it opens url in the
-// browser when there is one (calls), else mmt on that channel in the
-// configured terminal.
-func (a *agent) open(channel, url string) {
+// relayed shows a notification an mmt window handed over; a click brings
+// back app, the terminal it runs in.
+func (a *agent) relayed(title, body, app string) {
+	if !bundleID.MatchString(app) {
+		app = ""
+	}
+	show(title, body, "", "", app)
+}
+
+var bundleID = regexp.MustCompile(`^[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$`)
+
+// open is called when a notification is clicked: it brings app to the
+// front for one an mmt window handed over, opens url in the browser when
+// there is one (calls), else mmt on that channel in the configured terminal.
+func (a *agent) open(channel, url, app string) {
+	if app != "" {
+		if err := exec.Command("open", "-b", app).Run(); err != nil {
+			log.Printf("open %s: %v", app, err)
+		}
+		return
+	}
 	cfg, err := config.Load()
 	if err != nil {
 		log.Printf("open: %v", err)

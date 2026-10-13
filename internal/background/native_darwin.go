@@ -9,7 +9,7 @@ package background
 #import <Cocoa/Cocoa.h>
 #import <UserNotifications/UserNotifications.h>
 
-extern void mmtClicked(char *channel, char *url);
+extern void mmtClicked(char *channel, char *url, char *app);
 extern void mmtNotifyFailed(char *msg);
 extern void mmtPermission(int status);
 
@@ -53,8 +53,8 @@ static void report(NSError *err) {
     didReceiveNotificationResponse:(UNNotificationResponse *)response
              withCompletionHandler:(void (^)(void))done {
 	NSDictionary *info = response.notification.request.content.userInfo;
-	NSString *ch = info[@"channel"], *url = info[@"url"];
-	mmtClicked((char *)[(ch ?: @"") UTF8String], (char *)[(url ?: @"") UTF8String]);
+	NSString *ch = info[@"channel"], *url = info[@"url"], *app = info[@"app"];
+	mmtClicked((char *)[(ch ?: @"") UTF8String], (char *)[(url ?: @"") UTF8String], (char *)[(app ?: @"") UTF8String]);
 	done();
 }
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
@@ -79,13 +79,13 @@ static NSString *str(const char *s) {
 	return [NSString stringWithUTF8String:s] ?: @"";
 }
 
-static void mmtNotify(const char *title, const char *body, const char *channel, const char *url) {
+static void mmtNotify(const char *title, const char *body, const char *channel, const char *url, const char *app) {
 	UNMutableNotificationContent *ct = [UNMutableNotificationContent new];
 	ct.title = str(title);
 	ct.body = str(body);
 	ct.sound = [UNNotificationSound defaultSound];
 	ct.threadIdentifier = str(channel);
-	ct.userInfo = @{@"channel": str(channel), @"url": str(url)};
+	ct.userInfo = @{@"channel": str(channel), @"url": str(url), @"app": str(app)};
 	UNNotificationRequest *rq = [UNNotificationRequest requestWithIdentifier:[[NSUUID UUID] UUIDString]
 	                                                                 content:ct
 	                                                                 trigger:nil];
@@ -101,16 +101,17 @@ const nativeNotifications = true
 
 // runMain runs the Cocoa event loop; it must be called on the main thread
 // and does not return.
-func runMain(click func(channel, url string)) {
+func runMain(click func(channel, url, app string)) {
 	onClick = click
 	C.mmtRun()
 }
 
-func show(title, body, channel, url string) {
-	t, b, c, u := C.CString(title), C.CString(body), C.CString(channel), C.CString(url)
+func show(title, body, channel, url, app string) {
+	t, b, c, u, a := C.CString(title), C.CString(body), C.CString(channel), C.CString(url), C.CString(app)
 	defer C.free(unsafe.Pointer(t))
 	defer C.free(unsafe.Pointer(b))
 	defer C.free(unsafe.Pointer(c))
 	defer C.free(unsafe.Pointer(u))
-	C.mmtNotify(t, b, c, u)
+	defer C.free(unsafe.Pointer(a))
+	C.mmtNotify(t, b, c, u, a)
 }

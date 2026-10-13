@@ -142,6 +142,8 @@ Lệnh này bật một agent nhỏ chạy ngầm (LaunchAgent, khởi động l
 chạy). Nó giữ kết nối và hiện thông báo macOS khi có người nhắc tên, nhắn
 riêng hay gọi, kể cả lúc không mở cửa sổ mmt nào. Bấm vào thông báo là mmt mở
 đúng kênh đó. Khi mmt đang mở thì agent im lặng, nên không bị báo hai lần.
+Trong Terminal.app, agent cũng hiện thông báo thay cho cửa sổ mmt đang mở,
+nên bấm vào là Terminal hiện lên; không có agent thì mmt chỉ rung chuông.
 Lần đầu macOS sẽ hỏi có cho mmt gửi thông báo không, chọn Cho phép.
 `mmt background status` để xem agent có chạy không, `mmt background off` để
 gỡ. `mmt setup` cũng hỏi phần này.

@@ -10,6 +10,7 @@ import (
 
 	"github.com/atotto/clipboard"
 
+	"github.com/codihaus/mmt/internal/background"
 	"github.com/codihaus/mmt/internal/launcher"
 )
 
@@ -72,9 +73,11 @@ var termNotifies = (os.Getenv("TERM_PROGRAM") == "iTerm.app" || os.Getenv("TERM_
 	!launcher.InMultiplexer()
 
 // notify shows a desktop notification. In iTerm2 and Ghostty it goes through
-// the terminal (OSC 9), so clicking it brings back the mmt tab; elsewhere it
-// uses terminal-notifier when installed (clicking activates the terminal app)
-// or osascript. Arguments are passed as argv, never as script text.
+// the terminal (OSC 9), so clicking it brings back the mmt tab. Elsewhere on
+// macOS, terminal-notifier when installed or else the background agent post
+// it, and clicking activates the terminal app; with neither, the terminal
+// bell stands in, since an osascript notification opens Script Editor when
+// clicked. Arguments are passed as argv, never as script text.
 func (m *Model) notify(title, body string) {
 	title, body = m.noticeText(title, body)
 	if r := []rune(body); len(r) > 200 {
@@ -97,11 +100,11 @@ func (m *Model) notify(title, body string) {
 			go exec.Command("terminal-notifier", args...).Run()
 			return
 		}
-		go exec.Command("osascript",
-			"-e", "on run argv",
-			"-e", "display notification (item 2 of argv) with title (item 1 of argv)",
-			"-e", "end run",
-			title, body).Run()
+		go func() {
+			if !background.Relay(title, body, os.Getenv("__CFBundleIdentifier")) {
+				_, _ = os.Stdout.WriteString("\a")
+			}
+		}()
 	case "linux":
 		if _, err := exec.LookPath("notify-send"); err == nil {
 			go exec.Command("notify-send", "--", title, body).Run()
