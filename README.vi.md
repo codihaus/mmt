@@ -80,6 +80,10 @@ chuột để cuộn, kéo để bôi chọn chữ. `Ctrl+V` dán ảnh chụp m
 vào cửa sổ để đính kèm.
 
 | Phím | |
+Dòng kẻ dưới tên kênh liệt kê các hội thoại khác có tin chưa đọc, mới nhất
+trước, chỉ hiện tên ngắn và số lần được nhắc tên. Kênh đã cuộn khuất khỏi
+sidebar vẫn hiện ở đây. Click vào tên là mở hội thoại đó.
+
 | --- | --- |
 | `Enter` / `Shift+Enter` | Gửi / xuống dòng. Terminal nào không nhận `Shift+Enter` thì gõ `\` rồi `Enter` |
 | `Ctrl+K` | Tìm kênh hoặc người |

@@ -84,6 +84,10 @@ thread, scroll with the wheel, drag to select text. Paste a screenshot with
 `Ctrl+V` or drop a file on the window to attach it.
 
 | Key | |
+The line under the channel name lists every other conversation with unread
+messages, newest first, with a short name and the mention count. A channel
+scrolled out of the sidebar still shows up there. Click a name to open it.
+
 | --- | --- |
 | `Enter` / `Shift+Enter` | Send / new line. If your terminal eats `Shift+Enter`, type `\` then `Enter` |
 | `Ctrl+K` | Find a channel or person |

@@ -471,6 +471,11 @@ func (m *Model) handleMouse(ev tea.MouseMsg) tea.Cmd {
 		}
 		return nil
 	}
+	if ev.Y == pg.vpTop-1 && newBarHost(k, g.split) {
+		if id := m.newBarAt(pg.w, ev.X-g.sideW-pg.x); id != "" {
+			return m.switchTo(id)
+		}
+	}
 	if ev.Y >= pg.vpTop && ev.Y < pg.vpTop+pn.vp.Height {
 		// wait for the release to tell a click from a drag
 		at := m.cellAt(k, ev.X, ev.Y)

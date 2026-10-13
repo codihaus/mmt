@@ -8,6 +8,7 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/mattermost/mattermost/server/public/model"
 
 	"github.com/codihaus/mmt/internal/config"
@@ -186,5 +187,44 @@ func TestLockScreen(t *testing.T) {
 	m.onUnlock(unlockMsg{ok: true})
 	if m.lock != nil {
 		t.Error("unlock did not clear the lock")
+	}
+}
+
+func TestNewBar(t *testing.T) {
+	item := func(id, label string, last, unread, mentions int64, muted bool) *chanItem {
+		return &chanItem{
+			ch:    &model.Channel{Id: id, TeamId: "t", Type: model.ChannelTypeOpen, LastPostAt: last},
+			label: label, unread: unread, mentions: mentions, muted: muted,
+		}
+	}
+	m := &Model{team: "t", cur: "open", items: map[string]*chanItem{
+		"open":  item("open", "here", 9, 3, 0, false),
+		"ops":   item("ops", "ops", 5, 1, 0, false),
+		"zoro":  item("zoro", "a very long channel name", 7, 2, 2, false),
+		"quiet": item("quiet", "muted", 8, 4, 0, true),
+		"read":  item("read", "read", 6, 0, 0, false),
+	}}
+	chips, more := m.newBarChips(80)
+	if more != 0 || len(chips) != 2 || chips[0].id != "zoro" || chips[1].id != "ops" {
+		t.Fatalf("chips %+v, more %d", chips, more)
+	}
+	if got := m.newBarAt(80, chips[1].x0); got != "ops" {
+		t.Errorf("click on ops opened %q", got)
+	}
+	if got := m.newBarAt(80, 0); got != "" {
+		t.Errorf("click on the rule opened %q", got)
+	}
+	if w := ansi.StringWidth(m.newBar(80, stDim)); w != 80 {
+		t.Errorf("bar is %d cells, want 80", w)
+	}
+	chips, more = m.newBarChips(chips[0].x1 + 6)
+	if len(chips) != 1 || more != 1 {
+		t.Errorf("narrow: %d chips, more %d", len(chips), more)
+	}
+	if w := ansi.StringWidth(m.newBar(chips[0].x1+6, stDim)); w != chips[0].x1+6 {
+		t.Errorf("narrow bar is %d cells", w)
+	}
+	if w := ansi.StringWidth(m.newBar(10, stDim)); w != 10 {
+		t.Errorf("tiny bar is %d cells", w)
 	}
 }

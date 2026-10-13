@@ -13,11 +13,15 @@ build on the same day.
 
 ### Added
 
+- A new-messages bar in the line under the channel name: every other
+  conversation with unread messages, newest first, with a short name and the
+  mention count. A message to a channel scrolled out of the sidebar is no
+  longer missed. Click a name to open it. Works alongside the Unreads filter.
 - Delete your own messages: select one with `↑`, press `d`, then `Enter` to
   confirm. The message disappears at once and comes back if the server
   refuses. Enter confirms rather than a second `d`, because Vietnamese Telex
   turns `dd` into `đ`.
-- The README links the landing page.
+- This changelog. The README links it and the landing page.
 
 ### Changed
 

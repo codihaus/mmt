@@ -316,7 +316,11 @@ func (m *Model) viewPane(k paneKind, pg paneGeo, split bool) string {
 		ruleColor = colAccent
 	}
 	title := ansi.Truncate(m.paneTitle(k, split), w, "…")
-	rule := lipgloss.NewStyle().Foreground(ruleColor).Render(strings.Repeat("─", w))
+	ruleSt := lipgloss.NewStyle().Foreground(ruleColor)
+	rule := ruleSt.Render(strings.Repeat("─", w))
+	if newBarHost(k, split) {
+		rule = m.newBar(w, ruleSt)
+	}
 
 	body := m.highlight(k, p.vp.View(), w)
 	if pad := m.padTop(k); pad > 0 {
