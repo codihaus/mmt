@@ -118,6 +118,19 @@ func (m *Model) notify(title, body string) {
 	}
 }
 
+// focusTerminal brings the terminal running mmt to the front. iTerm2 does
+// it from an escape sequence, which also picks mmt's tab; elsewhere on macOS
+// the terminal app is activated.
+func focusTerminal() {
+	if os.Getenv("TERM_PROGRAM") == "iTerm.app" && !launcher.InMultiplexer() {
+		_, _ = os.Stdout.WriteString("\x1b]1337;StealFocus\a")
+		return
+	}
+	if id := os.Getenv("__CFBundleIdentifier"); runtime.GOOS == "darwin" && id != "" {
+		go exec.Command("open", "-b", id).Run()
+	}
+}
+
 const windowsToast = `[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 $xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
 $text = $xml.GetElementsByTagName('text')

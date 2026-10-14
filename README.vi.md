@@ -187,6 +187,8 @@ giúp.
 | `terminal` | `auto`, `iterm2`, `ghostty` hoặc `current` |
 | `browser` | App mở link, ví dụ `"Google Chrome"`. Để trống thì dùng trình duyệt mặc định |
 | `lock`, `lock_after_minutes` | `mmt lock` ghi vào |
+| `call_sound` | Nhạc chuông khi có cuộc gọi đến: file âm thanh, hoặc `"off"`. Để trống thì dùng chuông điện thoại quay số có sẵn |
+| `buzz_sound` | Âm thanh khi bị buzz: file âm thanh, hoặc `"off"`. Để trống thì dùng tiếng buzz có sẵn |
 
 Vài biến môi trường ghi đè config: `MMT_URL` và `MMT_TOKEN` (tiện khi viết
 script hay chạy demo), `MMT_LANG`, `MMT_NO_IMAGES=1` để tắt ảnh inline, và
@@ -219,3 +221,10 @@ Xem thêm [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Giấy phép
 
 Apache 2.0, xem [LICENSE](LICENSE).
+
+Chuông cuộc gọi được cắt từ
+[WWS AutomatictelephoneIskraEta80ringing.ogg](https://commons.wikimedia.org/wiki/File:WWS_AutomatictelephoneIskraEta80ringing.ogg)
+của Work With Sounds / Technical Museum of Slovenia, giấy phép
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Tiếng buzz là
+BUZZ! của Yahoo! Messenger; âm thanh thuộc về Yahoo, mmt không liên quan
+tới Yahoo.

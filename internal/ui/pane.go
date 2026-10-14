@@ -336,7 +336,7 @@ func (m *Model) viewPane(k paneKind, pg paneGeo, split bool) string {
 
 	box := stInputBox
 	switch {
-	case active && m.focus == focusInput && strings.HasPrefix(m.input.Value(), "!"):
+	case active && m.focus == focusInput && strings.HasPrefix(m.input.Value(), "!") && !isBuzz(m.input.Value()):
 		box = stInputShell // a local command, not a message
 	case active && m.focus == focusInput:
 		box = stInputOn

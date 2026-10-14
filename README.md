@@ -193,6 +193,8 @@ common bits for you.
 | `terminal` | `auto`, `iterm2`, `ghostty` or `current` |
 | `browser` | App to open links with, e.g. `"Google Chrome"`. Empty means the default browser |
 | `lock`, `lock_after_minutes` | Written by `mmt lock` |
+| `call_sound` | Ringtone for incoming calls: a sound file, or `"off"`. Empty uses the built-in rotary phone ring |
+| `buzz_sound` | Sound for a buzz: a sound file, or `"off"`. Empty uses the built-in buzz |
 
 A few environment variables override it: `MMT_URL` and `MMT_TOKEN` (handy for
 scripts and the demo), `MMT_LANG`, `MMT_NO_IMAGES=1` to turn off inline
@@ -227,3 +229,10 @@ More in [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 Apache 2.0, see [LICENSE](LICENSE).
+
+The call ringtone is cut from
+[WWS AutomatictelephoneIskraEta80ringing.ogg](https://commons.wikimedia.org/wiki/File:WWS_AutomatictelephoneIskraEta80ringing.ogg)
+by Work With Sounds / Technical Museum of Slovenia, licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The buzz is the
+BUZZ! of Yahoo! Messenger; the sound belongs to Yahoo, and mmt is not
+affiliated with Yahoo.

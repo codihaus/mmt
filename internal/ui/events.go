@@ -170,6 +170,9 @@ func (m *Model) onPosted(p *model.Post, data map[string]any) tea.Cmd {
 	cmds = append(cmds, m.usersCmd([]string{p.UserId}))
 
 	mine := p.UserId == m.c.Me.Id
+	if !mine && p.Type == "" && isBuzz(p.Message) {
+		cmds = append(cmds, m.onBuzz(p, it))
+	}
 	if p.ChannelId == m.cur {
 		if !mine && time.Since(m.lastView[m.cur]) > 3*time.Second {
 			cmds = append(cmds, m.viewCmd(m.cur, ""))

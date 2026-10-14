@@ -9,6 +9,7 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 
 	"github.com/codihaus/mmt/internal/mm"
+	"github.com/codihaus/mmt/internal/sound"
 )
 
 // Calls (the com.mattermost.calls plugin) need audio and video, which a
@@ -35,6 +36,7 @@ func (m *Model) openCallCmd(channelID string) tea.Cmd {
 	if u == "" {
 		return nil
 	}
+	sound.StopRing(channelID)
 	if m.activeCall(channelID) {
 		m.setStatus(tr("Joining the call in the browser"), false)
 	} else {
@@ -132,10 +134,12 @@ func (m *Model) onCallEvent(ev *model.WebSocketEvent) tea.Cmd {
 		owner, _ := data["owner_id"].(string)
 		if it := m.items[ch]; it != nil && owner != m.c.Me.Id && isDM(it.ch) {
 			m.notify(tr("Incoming call"), fmt.Sprintf(tr("%s is calling you"), "@"+m.c.Username(owner)))
+			sound.Ring(ch, m.cfg.CallSound)
 		}
 		return m.usersCmd([]string{owner})
 	case "call_end":
 		m.calls[ch] = false
+		sound.StopRing(ch)
 	}
 	return nil
 }

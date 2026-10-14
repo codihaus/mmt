@@ -9,6 +9,26 @@ build on the same day.
 
 ## [Unreleased]
 
+## [0.1.0-beta.20261014] - 2026-10-14
+
+### Added
+
+- An incoming DM call rings like an old rotary phone, repeated until the call
+  ends, you join it, or 30 seconds pass. Set `call_sound` in the config to a
+  sound file of your own, or to `"off"` for silence. The background agent
+  rings too when no mmt window is open. The ring is a recording of an Iskra
+  Eta 80 telephone (CC BY 4.0, credited in the README).
+- Buzz, as in Yahoo! Messenger: send a message that is just `!buzz` (from mmt
+  or any other client) and everyone in that channel who has mmt open gets the
+  terminal brought to the front, the old Yahoo! BUZZ! sound and a shaking
+  screen. The conversation opens unless they are typing or in a thread.
+  Muted channels stay quiet, and a burst of buzzes counts once every 5
+  seconds. Set `buzz_sound` to a sound file of your own, or to `"off"`. In
+  mmt, `!buzz` sends the buzz instead of running a shell command.
+- `make video` has a key for a buzz (`7`).
+- The landing page shows the ring and the buzz in short videos with their
+  sound (muted until you press Sound on).
+
 ## [0.1.0-beta.20261013] - 2026-10-13
 
 ### Added
@@ -118,7 +138,8 @@ First public beta.
 - English and Vietnamese UI.
 - `make demo` runs mmt against a mock server, no Mattermost needed.
 
-[Unreleased]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261013...HEAD
+[Unreleased]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261014...HEAD
+[0.1.0-beta.20261014]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261013...v0.1.0-beta.20261014
 [0.1.0-beta.20261013]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261006...v0.1.0-beta.20261013
 [0.1.0-beta.20261006]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261001.3...v0.1.0-beta.20261006
 [0.1.0-beta.20261001.3]: https://github.com/codihaus/mmt/compare/v0.1.0-beta.20261001.2...v0.1.0-beta.20261001.3

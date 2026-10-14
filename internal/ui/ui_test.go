@@ -228,3 +228,36 @@ func TestNewBar(t *testing.T) {
 		t.Errorf("tiny bar is %d cells", w)
 	}
 }
+
+func TestBuzz(t *testing.T) {
+	for in, want := range map[string]bool{"!buzz": true, " !BUZZ\n": true, "!Buzz": true, "!buzz me": false, "buzz": false, `\!buzz`: false} {
+		if got := isBuzz(in); got != want {
+			t.Errorf("isBuzz(%q) = %v, want %v", in, got, want)
+		}
+	}
+
+	// no terminal comes to the front during the test
+	t.Setenv("TERM_PROGRAM", "")
+	t.Setenv("__CFBundleIdentifier", "")
+	m := &Model{w: 10, cfg: &config.Config{BuzzSound: "off"}}
+	quiet := &chanItem{muted: true}
+	if m.onBuzz(&model.Post{}, quiet); m.shake != 0 {
+		t.Error("a muted channel buzzed")
+	}
+	m.onBuzz(&model.Post{}, nil)
+	if m.shake != len(shakeOffsets) {
+		t.Fatalf("shake = %d after a buzz", m.shake)
+	}
+	if got := m.shaken("abcdefghij"); got != "   abcdefg" {
+		t.Errorf("first shake frame = %q", got)
+	}
+	m.shake = 1
+	m.onBuzz(&model.Post{}, nil)
+	if m.shake != 1 {
+		t.Error("a second buzz inside the cooldown counted")
+	}
+	m.update(shakeMsg{})
+	if m.shake != 0 || m.shaken("abc") != "abc" {
+		t.Error("the shake did not end")
+	}
+}

@@ -22,11 +22,13 @@ import (
 	"github.com/codihaus/mmt/internal/i18n"
 	"github.com/codihaus/mmt/internal/launcher"
 	"github.com/codihaus/mmt/internal/mm"
+	"github.com/codihaus/mmt/internal/sound"
 )
 
 const (
 	callPostType  = "custom_calls"
 	callStartType = "custom_com.mattermost.calls_call_start"
+	callEndType   = "custom_com.mattermost.calls_call_end"
 )
 
 type agent struct {
@@ -168,6 +170,20 @@ func (a *agent) handle(ev *model.WebSocketEvent) {
 		url := a.webURL(cx, ch)
 		cancel()
 		a.notify(i18n.T("Incoming call"), fmt.Sprintf(i18n.T("%s is calling you"), "@"+name), ch, url)
+		// an open mmt window rings itself
+		if !uiOpen() {
+			file := ""
+			if cfg, err := config.Load(); err == nil {
+				file = cfg.CallSound
+			}
+			sound.Ring(ch, file)
+		}
+	case callEndType:
+		ch, _ := data["channelID"].(string)
+		if ch == "" {
+			ch = ev.GetBroadcast().ChannelId
+		}
+		sound.StopRing(ch)
 	}
 }
 
@@ -259,6 +275,7 @@ func (a *agent) open(channel, url, app string) {
 		return
 	}
 	if url != "" {
+		sound.StopRing("")
 		args := []string{url}
 		if cfg.Browser != "" {
 			args = []string{"-a", cfg.Browser, url}

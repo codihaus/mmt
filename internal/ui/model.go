@@ -107,6 +107,8 @@ type Model struct {
 
 	sw        *switcher
 	lock      *lockState   // app lock screen; nil when unlocked
+	buzzAt    time.Time    // last buzz answered
+	shake     int          // frames of the buzz shake left
 	lastInput time.Time    // last key or mouse event, for the idle lock
 	shell     *shellView   // a !command and its output
 	react     *reactPicker // emoji picker for a reaction
@@ -849,7 +851,8 @@ func (m *Model) send() tea.Cmd {
 	if r := reactShortcut.FindStringSubmatch(text); r != nil && len(m.attach) == 0 {
 		return m.reactToLatest(r[1])
 	}
-	if strings.HasPrefix(text, "!") && len(m.attach) == 0 {
+	// "!buzz" is a buzz, not a shell command
+	if strings.HasPrefix(text, "!") && len(m.attach) == 0 && !isBuzz(text) {
 		return m.runShell(strings.TrimPrefix(text, "!"))
 	}
 	// "\!" sends a message that really starts with "!"
@@ -1225,6 +1228,15 @@ func (m *Model) update(msg tea.Msg) tea.Cmd {
 
 	case statusMsg:
 		m.setStatus(msg.text, msg.err)
+		return nil
+
+	case shakeMsg:
+		if m.shake > 0 {
+			m.shake--
+		}
+		if m.shake > 0 {
+			return shakeTick()
+		}
 		return nil
 
 	case tickMsg:

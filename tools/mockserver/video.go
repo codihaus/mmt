@@ -312,6 +312,7 @@ const controlsHelp = `
   4  a teammate types and posts in the channel you have open
   5  a teammate reacts to your latest message
   6  nami posts a new sea chart in the channel you have open
+  7  franky buzzes you                    (terminal to the front, shake)
   q  quit
 `
 
@@ -341,6 +342,9 @@ func (s *server) controls() {
 		case '2':
 			say("2: franky is calling\n> ")
 			go s.incomingCall("c-dm-duc", uDuc)
+		case '7':
+			say("7: franky buzzes\n> ")
+			go s.say("c-dm-duc", "", uDuc, "!buzz", nil)
 		case '3':
 			say("3: robin → DM\n> ")
 			go s.say("c-dm-lan", "", uLan, "Found a Road Poneglyph. Coordinates are in the vault. Burn after reading.", nil)

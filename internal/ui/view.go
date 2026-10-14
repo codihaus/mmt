@@ -419,7 +419,7 @@ func (m *Model) View() string {
 	if g.sideW > 0 {
 		body = lipgloss.JoinHorizontal(lipgloss.Top, m.viewSidebar(g), main)
 	}
-	return body + "\n" + m.viewFooter() + m.imageOverlay(g, strings.Split(body, "\n"))
+	return m.shaken(body+"\n"+m.viewFooter()) + m.imageOverlay(g, strings.Split(body, "\n"))
 }
 
 func (m *Model) viewSidebar(g geo) string {
@@ -541,7 +541,7 @@ func (m *Model) viewFooter() string {
 		parts = []string{"1-8 or ↑↓ Enter react", "type to search", "Esc close"}
 	case m.files != nil:
 		parts = []string{"↑↓ move", "Enter open folder / attach", "Tab mark", "← parent folder", "~ home", "type to search", "Esc close"}
-	case m.focus == focusInput && strings.HasPrefix(m.input.Value(), "!"):
+	case m.focus == focusInput && strings.HasPrefix(m.input.Value(), "!") && !isBuzz(m.input.Value()):
 		parts = []string{"Enter runs this on your computer (not sent to the chat)", "\\! sends a message starting with !"}
 	case m.wiz != nil:
 		parts = []string{"Enter next", "Tab complete", "Shift+Tab back", "Esc cancel"}

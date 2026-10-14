@@ -29,6 +29,12 @@ type Config struct {
 	LockAfter int `json:"lock_after_minutes,omitempty"`
 	// UnreadsOnly shows only conversations with unread messages in the sidebar.
 	UnreadsOnly bool `json:"unreads_only,omitempty"`
+	// CallSound rings on an incoming call: a sound file, "off" for silence,
+	// or empty for the system sound.
+	CallSound string `json:"call_sound,omitempty"`
+	// BuzzSound plays on a buzz (a message that is just "!buzz"), with the
+	// same values as CallSound.
+	BuzzSound string `json:"buzz_sound,omitempty"`
 
 	fromEnv bool // server came from MMT_URL; never persisted
 }
