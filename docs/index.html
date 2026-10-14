@@ -201,6 +201,12 @@ main { min-width: 0; }
 .shot-bar span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .shot-body { position: relative; aspect-ratio: var(--ratio, 16 / 9); max-width: 100%; display: grid; place-items: center; background: var(--term); }
 .shot-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.shot-sound {
+  position: absolute; right: 10px; bottom: 10px;
+  font: 500 0.75rem var(--font-body); color: #e6eaf3;
+  background: rgba(23, 34, 61, 0.85); border: 1px solid #24304e; border-radius: 6px; padding: 4px 10px; cursor: pointer;
+}
+.shot-sound:hover, .shot-sound[aria-pressed="true"] { border-color: var(--accent); color: #fff; }
 .shot-empty {
   display: grid; justify-items: center; gap: 8px; text-align: center;
   padding: 16px; color: var(--muted); font-size: var(--step--1);
@@ -363,7 +369,7 @@ img { max-width: 100%; }
     <div class="side-group">
       <div class="side-label">▾ ON THIS PAGE</div>
       <a href="#overview" data-nav="overview"><span># overview</span></a>
-      <a href="#features" data-nav="features"><span># features</span><span class="n">6</span></a>
+      <a href="#features" data-nav="features"><span># features</span><span class="n">8</span></a>
       <a href="#more" data-nav="more"><span># more</span><span class="n">6</span></a>
       <a href="#keys" data-nav="keys"><span># keys</span></a>
       <a href="#install" data-nav="install"><span># install</span></a>
@@ -476,6 +482,24 @@ img { max-width: 100%; }
             </div>
             <figure class="shot" data-slot="notify" data-src="assets/notify.png" data-title="Notification Center"></figure>
           </div>
+
+          <div class="row">
+            <div class="copytext">
+              <div class="trigger"><span class="chip">call_sound</span></div>
+              <h3>Calls ring like an old rotary phone</h3>
+              <p>When someone calls you in a DM, mmt rings until the call ends, you join it, or 30 seconds pass. With every window closed, the background agent rings instead. Put any sound file in <code>call_sound</code>, or <code>"off"</code> for silence.</p>
+            </div>
+            <figure class="shot" data-slot="ring" data-src="assets/ring.mp4" data-title="@ franky · incoming call"></figure>
+          </div>
+
+          <div class="row">
+            <div class="copytext">
+              <div class="trigger"><span class="chip">!buzz</span></div>
+              <h3>BUZZ!, the Yahoo! Messenger way</h3>
+              <p>Send a message that is just <code>!buzz</code>, from mmt or any other Mattermost app. Everyone in that channel with mmt open gets their terminal pulled to the front, the old BUZZ! sound and a shaking screen, and the conversation opens unless they are typing. Muted channels stay quiet.</p>
+            </div>
+            <figure class="shot" data-slot="buzz" data-src="assets/buzz.mp4" data-title="@ franky · !buzz"></figure>
+          </div>
         </div>
       </div>
     </section>
@@ -513,7 +537,7 @@ img { max-width: 100%; }
           <div class="card">
             <figure class="shot" data-slot="calls" data-src="assets/calls.gif" data-title="# Sick Bay"></figure>
             <h3>Calls go to the browser</h3>
-            <p>A terminal can't do audio. Calls show up as cards, and <code>/call</code> or a click joins the call directly in your browser.</p>
+            <p>mmt rings, but a terminal can't carry the call itself. Calls show up as cards, and <code>/call</code> or a click joins the call directly in your browser.</p>
           </div>
         </div>
 
@@ -586,7 +610,7 @@ img { max-width: 100%; }
 
     <footer>
       <div class="wrap">
-        <span>mmt · Apache 2.0 · made by people who live in the terminal</span>
+        <span>mmt · Apache 2.0 · made by people who live in the terminal · ring: <a href="https://commons.wikimedia.org/wiki/File:WWS_AutomatictelephoneIskraEta80ringing.ogg">Iskra Eta 80, Technical Museum of Slovenia</a>, CC BY 4.0 · BUZZ! belongs to Yahoo</span>
         <span><a href="https://github.com/codihaus/mmt">github.com/codihaus/mmt</a></span>
       </div>
     </footer>
@@ -604,10 +628,37 @@ img { max-width: 100%; }
   for (const f of frames) {
     f.innerHTML = '<div class="shot-bar"><i></i><i></i><i></i><span></span></div><div class="shot-body"></div>';
     f.querySelector(".shot-bar span").textContent = f.dataset.title || "";
+    const label = (f.closest(".row, .card")?.querySelector("h3")?.textContent || f.dataset.title || "") + " in mmt";
+    if (f.dataset.src.endsWith(".mp4")) {
+      // a recording with its sound: plays muted until the visitor asks for it
+      const v = document.createElement("video");
+      v.className = "shot-img";
+      Object.assign(v, { muted: true, autoplay: true, loop: true, playsInline: true, preload: "metadata", src: f.dataset.src });
+      v.setAttribute("aria-label", label);
+      const b = document.createElement("button");
+      b.className = "shot-sound";
+      b.type = "button";
+      b.textContent = "Sound on";
+      b.addEventListener("click", () => {
+        const on = v.muted;
+        for (const o of document.querySelectorAll(".shot video")) o.muted = true;
+        for (const o of document.querySelectorAll(".shot-sound")) { o.textContent = "Sound on"; o.setAttribute("aria-pressed", "false"); }
+        if (on) {
+          v.muted = false;
+          v.currentTime = 0;
+          v.play();
+          b.textContent = "Sound off";
+          b.setAttribute("aria-pressed", "true");
+        }
+      });
+      b.setAttribute("aria-pressed", "false");
+      f.querySelector(".shot-body").append(v, b);
+      continue;
+    }
     const img = document.createElement("img");
     img.className = "shot-img";
     img.loading = "lazy";
-    img.alt = (f.closest(".row, .card")?.querySelector("h3")?.textContent || f.dataset.title || "") + " in mmt";
+    img.alt = label;
     img.src = f.dataset.src;
     f.querySelector(".shot-body").appendChild(img);
   }
